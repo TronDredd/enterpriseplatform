@@ -23,4 +23,7 @@
   .margin-left-4 {
     margin-left: .4rem;
   }
+  .pointer {
+    cursor: pointer;
+  }
 </style>

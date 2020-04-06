@@ -13,7 +13,7 @@
                 </a>
                 <ul class="collapse sublist" id="nav-demand" aria-labelledby="nav-demand-tab" data-parent="#accordion">
                     <li>
-                        <router-link :to="{path: '/main/demand_list', query:{page_num: 1, page_size: 20}}"><span>需求列表</span></router-link>
+                        <router-link :to="{path: '/main/demand_list', query:{page_num: 1, page_size: 20, filter: filter}}"><span>需求列表</span></router-link>
                     </li>
                     <li>
                         <router-link :to="{path: '/main/my_demand', query: {page_num: 1, page_size: 20}}"><span>我的需求</span></router-link>
@@ -29,7 +29,7 @@
         name: "SideBarComponent",
         data: function() {
             return {
-
+                filter: 0
             }
         },
         methods: {
@@ -38,6 +38,8 @@
         mounted() {
             const target = this.$('.router-link-active').parent().parent();
             target.collapse('show');
+
+
         }
     }
 </script>

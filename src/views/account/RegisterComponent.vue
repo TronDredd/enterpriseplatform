@@ -81,6 +81,7 @@
                         console.log(JSON.stringify(response.data));
                         const data = response.data.data;
                         if(data && data == 'register success') {
+                            //user_name保存在sessionStorage中
                             //注册成功 直接跳到主页
                             this.$router.push({name: 'Main'});
                         }

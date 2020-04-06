@@ -69,6 +69,8 @@
                         console.log(JSON.stringify(response.data));
                         const data = response.data.data;
                         if(data && data == 'login success') {
+                            //用户名保存在sessionStorage中
+                            sessionStorage.setItem('user_name', user_name)
                             //登录成功 跳转至主界面
                             this.$router.push({name: 'Main'});
                         }
