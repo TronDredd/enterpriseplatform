@@ -8,7 +8,7 @@
         <ul class="menu-root" id="accordion">
             <li>
                 <a id="nav-demand-tab" data-toggle="collapse" data-target="#nav-demand" aria-expanded="false" aria-controls="nav-demand" class="menu-item">
-<!--                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="users" class="svg-inline&#45;&#45;fa fa-users fa-w-20" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path fill="currentColor" d="M96 224c35.3 0 64-28.7 64-64s-28.7-64-64-64-64 28.7-64 64 28.7 64 64 64zm448 0c35.3 0 64-28.7 64-64s-28.7-64-64-64-64 28.7-64 64 28.7 64 64 64zm32 32h-64c-17.6 0-33.5 7.1-45.1 18.6 40.3 22.1 68.9 62 75.1 109.4h66c17.7 0 32-14.3 32-32v-32c0-35.3-28.7-64-64-64zm-256 0c61.9 0 112-50.1 112-112S381.9 32 320 32 208 82.1 208 144s50.1 112 112 112zm76.8 32h-8.3c-20.8 10-43.9 16-68.5 16s-47.6-6-68.5-16h-8.3C179.6 288 128 339.6 128 403.2V432c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48v-28.8c0-63.6-51.6-115.2-115.2-115.2zm-223.7-13.4C161.5 263.1 145.6 256 128 256H64c-35.3 0-64 28.7-64 64v32c0 17.7 14.3 32 32 32h65.9c6.3-47.4 34.9-87.3 75.2-109.4z"></path></svg>-->
+                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="box-open" class="svg-inline w-20" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path fill="currentColor" d="M425.7 256c-16.9 0-32.8-9-41.4-23.4L320 126l-64.2 106.6c-8.7 14.5-24.6 23.5-41.5 23.5-4.5 0-9-.6-13.3-1.9L64 215v178c0 14.7 10 27.5 24.2 31l216.2 54.1c10.2 2.5 20.9 2.5 31 0L551.8 424c14.2-3.6 24.2-16.4 24.2-31V215l-137 39.1c-4.3 1.3-8.8 1.9-13.3 1.9zm212.6-112.2L586.8 41c-3.1-6.2-9.8-9.8-16.7-8.9L320 64l91.7 152.1c3.8 6.3 11.4 9.3 18.5 7.3l197.9-56.5c9.9-2.9 14.7-13.9 10.2-23.1zM53.2 41L1.7 143.8c-4.6 9.2.3 20.2 10.1 23l197.9 56.5c7.1 2 14.7-1 18.5-7.3L320 64 69.8 32.1c-6.9-.8-13.5 2.7-16.6 8.9z"></path></svg>
                     <span>需求</span>
                 </a>
                 <ul class="collapse sublist" id="nav-demand" aria-labelledby="nav-demand-tab" data-parent="#accordion">
@@ -16,7 +16,24 @@
                         <router-link :to="{path: '/main/demand_list', query:{page_num: 1, page_size: 20, filter: filter}}"><span>需求列表</span></router-link>
                     </li>
                     <li>
-                        <router-link :to="{path: '/main/my_demand', query: {page_num: 1, page_size: 20}}"><span>我的需求</span></router-link>
+                        <router-link :to="{path: '/main/my_demand', query: {page_num: 1, page_size: 20, user_id: getUserId}}"><span>我的需求</span></router-link>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a id="nav-order-tab" data-toggle="collapse" data-target="#nav-order" aria-expanded="false" aria-controls="nav-order" class="menu-item">
+                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="box-open" class="svg-inline w-20" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path fill="currentColor" d="M425.7 256c-16.9 0-32.8-9-41.4-23.4L320 126l-64.2 106.6c-8.7 14.5-24.6 23.5-41.5 23.5-4.5 0-9-.6-13.3-1.9L64 215v178c0 14.7 10 27.5 24.2 31l216.2 54.1c10.2 2.5 20.9 2.5 31 0L551.8 424c14.2-3.6 24.2-16.4 24.2-31V215l-137 39.1c-4.3 1.3-8.8 1.9-13.3 1.9zm212.6-112.2L586.8 41c-3.1-6.2-9.8-9.8-16.7-8.9L320 64l91.7 152.1c3.8 6.3 11.4 9.3 18.5 7.3l197.9-56.5c9.9-2.9 14.7-13.9 10.2-23.1zM53.2 41L1.7 143.8c-4.6 9.2.3 20.2 10.1 23l197.9 56.5c7.1 2 14.7-1 18.5-7.3L320 64 69.8 32.1c-6.9-.8-13.5 2.7-16.6 8.9z"></path></svg>
+                    <span>订单</span>
+                </a>
+                <ul class="collapse sublist" id="nav-order" aria-labelledby="nav-order-tab" data-parent="#accordion">
+                    <li>
+                        <router-link :to="{path: '/main/order_list', query:{page_num: 1, page_size: 20, filter: 0}}"><span>订单列表</span></router-link>
+                    </li>
+                    <li>
+                        <router-link :to="{path: '/main/create_order'}"><span>创建订单</span></router-link>
+                    </li>
+                    <li>
+                        <router-link :to="{path: '/main/order_statistics', query: {query_time: query_time, time_category: 'month', buy_in_or_sell: 1}}"><span>订单统计</span></router-link>
                     </li>
                 </ul>
             </li>
@@ -25,21 +42,40 @@
 </template>
 
 <script>
+    import dateFormat from "../../../utils/dateFormat";
+
     export default {
         name: "SideBarComponent",
         data: function() {
             return {
-                filter: 0
+                filter: 0,
+                user_info: {},
+                query_time: this.getUpdateTime()
             }
         },
         methods: {
-
+            getUpdateTime() {
+                const update_time = new Date()
+                return dateFormat('YYYY-mm-dd HH:MM:SS', update_time);
+            }
+        },
+        computed: {
+            getUserId() {
+                return this.user_info.user_id;
+            },
         },
         mounted() {
             const target = this.$('.router-link-active').parent().parent();
             target.collapse('show');
 
-
+            //对filter赋值
+            const user_info = this.$store.state.user_info;
+            //暂时
+            this.user_info = user_info;
+            if(user_info) {
+                const industry = user_info.industry;
+                this.filter = industry;
+            }
         }
     }
 </script>
@@ -68,11 +104,12 @@
         color: white;
     }
     .sublist li {
-        padding: .4rem 0;
+        padding: .4rem 2.4rem;
     }
     .sublist li a {
+        display: inline;
         text-align: left !important;
-        margin-left: 2rem;
+        padding-left: 2rem;
     }
     .sublist li a:hover {
         color: white !important;
@@ -93,10 +130,12 @@
         font-size: 2rem;
         background-color: #263543;
     }
+    #accordion li {
+        padding-bottom: 1rem;
+    }
     #accordion a {
         color: #a7adbe;
     }
-
     a[aria-expanded="true"] {
         font-weight: 600;
     }

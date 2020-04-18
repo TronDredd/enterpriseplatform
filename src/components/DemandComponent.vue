@@ -7,7 +7,7 @@
         </div>
         <div class="col-4 d-flex justify-content-center align-items-center">
             <button class="btn btn-danger">用户详情</button>
-            <button class="btn btn-primary margin-left-4">需求详情</button>
+            <button class="btn btn-primary margin-left-4" @click="demandDetail">需求详情</button>
         </div>
     </div>
 </template>
@@ -19,7 +19,12 @@
             'title',
             'description',
             'user_name'
-        ]
+        ],
+        methods: {
+            demandDetail() {
+                this.$emit('demandDetail');
+            }
+        }
     }
 </script>
 

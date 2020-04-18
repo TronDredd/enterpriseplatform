@@ -23,9 +23,12 @@
 ### response
 
 - 登录成功
-```
+```json
 {
-    "data": "login success"
+    "data": {
+        "user_name": "Frank",
+        "category": 2
+    }
 }
 ```
 
@@ -62,9 +65,11 @@
 
 - Method: **POST**
 - URL: ```/register```
-- Headers:
+- Headers: 
 ```
-
+{
+    
+}
 ```
 - Body:
 ```
@@ -109,6 +114,11 @@
 - Method: 'GET'
 - URL: ```/demand_list?page_num=1&page_size=20&filter=xxx```
 - Headers: 
+```
+{
+    Autherization: `${token}`
+}
+```
 - Body
 ```json
 
@@ -139,6 +149,82 @@
 }
 ```
 
+- 请求失败，缺少参数
+```
+{
+    "error_code": 400101,
+    "error_message": "parameters are invalid",
+    "data": null
+}
+```
+- 请求失败，未授权
+```json
+{
+    "error_code": 400102,
+    "error_message": "Unauthorized",
+    "data": null
+}
+```
+- 请求失败，其他异常
+```json
+{
+   "error_code": 500,
+   "error_message": "other exception",
+   "data": null
+}
+```
+
+## 需求列表，搜索栏搜索
+
+在URL参数上增加了search_content参数,其他和搜索列表接口相同
+
+## 我的需求列表
+
+### request
+
+- URL: ```/demand_list_self?page_num=1&page_size=20&user_id=2```\
+...其他与需求列表相同
+
+## 创建需求
+
+### request
+
+- Method: 'POST'
+- URL: ```/create_demand```
+- Headers: 
+```
+{
+    Autherization: `${token}`
+}
+```
+- Body:
+```json
+{
+    "title": "xxx",
+    "description": "xxx",
+    "category": "3",
+    "user_id": "2",
+    "update_time": "2020-4-9 20:55"
+}
+```
+
+### response
+
+- 请求成功
+
+```json
+{
+    "data": "create success"
+}
+```
+- 请求失败，未授权
+```json
+{
+    "error_code": 400102,
+    "error_message": "Unauthorized",
+    "data": null
+}
+```
 - 请求失败，缺少参数
 ```
 {

@@ -6,10 +6,10 @@
             <span @click="toRegisterHandler">REGISTER</span>
         </h1>
         <div class="nickname-input">
-            <input v-model="user_name" type="text" class="nickname-input_input" placeholder="请输入用户名">
+            <input v-model="user_name" type="text" class="nickname-input_input" placeholder="请输入用户名"/>
         </div>
         <div class="password-input">
-            <input v-model="password" type="password" class="password-input_input" placeholder="请输入密码">
+            <input v-model="password" type="password" class="password-input_input" placeholder="请输入密码"/>
         </div>
         <button class="style-button" @click="loginHandler">
             <span class="style-button_real-text-holder">
@@ -45,6 +45,8 @@
             return  {
                 user_name: "",
                 password: "",
+                //是否记住用户
+                is_remember: false,
             }
         },
         methods: {
@@ -68,9 +70,17 @@
                     .then(response => {
                         console.log(JSON.stringify(response.data));
                         const data = response.data.data;
-                        if(data && data == 'login success') {
-                            //用户名保存在sessionStorage中
-                            sessionStorage.setItem('user_name', user_name)
+                        if(data) {
+                            console.log(JSON.stringify(data));
+                            //用户名保存在sessionStorage和vuex中
+                            sessionStorage.setItem('user_name', user_name);
+                            this.$store.commit('updateUserInfo', data);
+                            if(data.token) {
+                                sessionStorage.setItem('token', data.token);
+                                if(this.is_remember) {
+                                    localStorage.setItem('token', data.token);
+                                }
+                            }
                             //登录成功 跳转至主界面
                             this.$router.push({name: 'Main'});
                         }
@@ -98,6 +108,12 @@
             toRegisterHandler() {
                 this.$emit('routerChange', ['register']);
                 this.$router.push({path: '/account/register'});
+            }
+        },
+        mounted() {
+            if(localStorage.getItem('token')) {
+                sessionStorage.setItem('token', localStorage.getItem('token'));
+                this.$router.push({name: 'Main'})
             }
         }
     }

@@ -1,3 +1,10 @@
 export const urlLogin = "login/";
 export const urlRegister = "register/";
-export const urlDemandList = 'demand_list/'
+export const urlDemandList = 'demand_list';
+export const urlDemandListSelf = 'demand_list_self';
+export const urlCreateDemand = 'create_demand';
+export const urlDemandImg = '';
+export const urlOrderList = 'order_list';
+export const urlOrderDelete = 'delete_order';
+export const urlCreateOrder = 'create_order';
+export const urlOrderQuery = 'order_query';

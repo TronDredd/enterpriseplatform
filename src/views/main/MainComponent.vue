@@ -15,7 +15,7 @@
     import SideBarComponent from "./bar/SideBarComponent";
     export default {
         name: "MainComponent",
-        components: {SideBarComponent, HeaderComponent}
+        components: {SideBarComponent, HeaderComponent},
     }
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-    <footer class="d-flex justify-content-center">
+    <footer class="d-flex justify-content-center paging-component">
         <div>
             <ul class="pagination">
                 <li class="page-item pointer"><a class="page-link" @click="formerPage()">&lt;</a></li>
@@ -37,5 +37,7 @@
 </script>
 
 <style scoped>
-
+    .paging-component {
+        padding-top: 1.2rem;
+    }
 </style>
