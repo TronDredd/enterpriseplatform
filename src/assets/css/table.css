@@ -1,0 +1,57 @@
+table {
+    table-layout: fixed;
+}
+.table {
+    margin-bottom: 0rem !important;
+}
+.table-div {
+    position: relative;
+    margin: 0.95rem 0 1.97rem;
+    overflow-y: scroll;
+    overflow-x: auto;
+    font-size: 1.9rem;
+}
+.table-box td img {
+    width: 1.8rem;
+    height: 1.8rem;
+}
+.table-box td span,
+.table-box th span {
+    display: inline-block;
+    padding: 0.8rem 1.1rem;
+}
+.table-box tbody tr {
+    border: transparent;
+    border-top: 1px solid rgba(82, 82, 82, 0.1) !important;
+    transition: 0.4s;
+    font-weight: bold;
+    transition: 0.4s;
+}
+.table-box tbody tr:hover {
+    transform: scaleY(1.02);
+    box-shadow:0px 6px 8px 0px rgba(82,82,82,0.1);
+    border-top: 1px solid rgba(82, 82, 82, 0.05) !important;
+}
+.table-box {
+
+}
+.table-thread {
+    color: #6C6C72;
+}
+.table-box .table-btn {
+    padding: 0.87rem 1.1rem;
+}
+.id-text:hover {
+    color: #5A8FFF;
+}
+.td-content-hide {
+    overflow: hidden;
+    /*text-overflow: ellipsis;*/
+    /*white-space: nowrap*/
+}
+.td-content-hide span {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

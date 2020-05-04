@@ -1,0 +1,29 @@
+input {
+    outline: none;
+}
+.input-box .search-input {
+    font-size: 1.6rem;
+    border: 1px solid #DBDBDB;
+    border-radius: 0.8rem;
+    padding: 0.6rem 1rem;
+}
+.input-box .search-btn {
+    margin-left: 1.1rem;
+    padding: 0.6rem 1rem;
+}
+select {
+    outline: none;
+}
+.select-box {
+    display: flex;
+    align-items: center;
+    border-radius:8px;
+    border:1px solid rgba(219,219,219,1);
+    color: #9E9EA2;
+    padding: 0.6rem 1rem;
+    font-size: 1.6rem;
+}
+.select-box select {
+    margin-left: 0.8rem;
+    border: transparent;
+}
