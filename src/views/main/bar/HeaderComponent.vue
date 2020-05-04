@@ -1,6 +1,9 @@
 <template>
     <div id="header-bar" class="bg-white">
         <nav class="nav justify-content-between align-items-center first-line">
+            <li>
+                <img src="../../../assets/unfold@f164810e.png" class="unfold-img">
+            </li>
             <li class="nav-item">
                 <button class="btn" id="showSideBar">
                     <i class="fas fa-bars"></i>
@@ -20,7 +23,6 @@
                 </div>
             </li>
         </nav>
-        <router-view name="v-selectedcomponent"></router-view>
     </div>
 </template>
 
@@ -43,13 +45,23 @@
 </script>
 
 <style scoped>
+    #header-bar {
+        position: relative;
+        z-index: 25;
+        font-size: 1.9rem;
+        padding-right: 3.6rem;
+    }
     nav {
-        height: 8vh;
-        padding: 0 1rem;
+        height: 100%;
         font-weight: 600;
     }
     nav span {
         margin-left: .8rem;
+    }
+    nav .unfold-img {
+        width: 2.5rem;
+        width: 2.5rem;
+        margin-left: 3.2rem;
     }
     .first-line {
         border-bottom: 1px solid #f3f3f3;
@@ -57,11 +69,7 @@
     .second-line a {
         margin: 0 1.2rem;
     }
-    #header-bar {
-        position: relative;
-        z-index: 25;
-    }
-    #doc {
-        margin-right: .8rem;
+    .dropdown-menu {
+        font-size: 1.7rem;
     }
 </style>

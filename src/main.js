@@ -9,6 +9,9 @@ import ant from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
 import Echarts from 'echarts'
 import dateFormat from "./utils/dateFormat";
+import categoryMap from "./utils/categoryMap";
+import {urlImageBase} from "./utils/urls";
+import formatTime from "./utils/timeFormat";
 
 
 Vue.use(ant)
@@ -21,7 +24,9 @@ Vue.prototype.getUpdateTime = () => {
   const update_time = new Date()
   return dateFormat('YYYY-mm-dd HH:MM:SS', update_time);
 };
-
+Vue.prototype.$categoryMap = categoryMap;
+Vue.prototype.$urlImageBase = urlImageBase;
+Vue.prototype.$formatTime = formatTime;
 Vue.use(Echarts)
 new Vue({
   router,

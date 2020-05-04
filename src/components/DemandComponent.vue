@@ -1,13 +1,16 @@
 <template>
     <div class="d-flex demand-component">
-        <div class="col-8 d-flex flex-column">
-            <span class="title_span">{{ title }}</span>
-            <span class="description_span">{{ description }}</span>
-            <span class="user_name_span">发布者：{{ user_name }}</span>
+        <div class="col-9 d-flex flex-row">
+            <div class="col-8 d-flex flex-column margin-right-2 text-info-box">
+                <span class="title_span">{{ title }}</span>
+                <span class="description_span">{{ description }}</span>
+                <span class="user_name_span">发布者：{{ user_name }}</span>
+            </div>
+            <img :src="img_url" class="col-4 flex-shrink-0 demand_img">
         </div>
-        <div class="col-4 d-flex justify-content-center align-items-center">
-            <button class="btn btn-danger">用户详情</button>
-            <button class="btn btn-primary margin-left-4" @click="demandDetail">需求详情</button>
+        <div class="col-3 d-flex flex-row justify-content-end align-items-center">
+            <button class="button-basic button-green">用户详情</button>
+            <button class="button-basic margin-left-8" @click="demandDetail">需求详情</button>
         </div>
     </div>
 </template>
@@ -18,7 +21,8 @@
         props: [
             'title',
             'description',
-            'user_name'
+            'user_name',
+            'img_url'
         ],
         methods: {
             demandDetail() {
@@ -29,27 +33,35 @@
 </script>
 
 <style scoped>
-    span {
+    .demand-component {
+        margin: 1rem;
+        padding: 0rem 0 1rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .text-info-box span {
+        max-width: 100%;
         text-align: left;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
     .title_span {
-        font-size: 30px;
-        font-weight: 600;
+        font-size: 3rem;
+        font-weight: 800;
+        color: rgba(0, 0, 0, 0.8);
     }
     .description_span {
         width: 100%;
-        font-size: 18px;
+        font-size: 1.6rem;
         overflow: hidden;
         text-overflow: ellipsis;
     }
     .user_name_span {
-        font-size: 14px;
-        color: rgba(0, 0, 0, 0.6);
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 0.4);
     }
-    .demand-component {
-        margin-bottom: 1rem;
-        padding: 0.8rem 0.4rem;
-        border-radius: 4px;
-        border: 1px solid rgba(0, 0, 0, 0.2);
+    .demand_img {
+        height: 10rem;
     }
 </style>

@@ -1,51 +1,54 @@
 <template>
-    <div class="modal fade" id="create-demand-modal" tabindex="-1" role="dialog" aria-labelledby="createDemandModalTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createDemandModalTitle">创建需求</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <table class="table table-borderless">
-                        <tbody>
-                            <tr>
-                                <td>需求标题:</td>
-                                <td>
-                                    <textarea v-model="title"></textarea>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>需求描述:</td>
-                                <td>
-                                    <textarea v-model="description"></textarea>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>需求类别:</td>
-                                <td>
-                                    <select v-model="category">
-                                        <option selected>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>需求图片:</td>
-                                <td>
-                                    <UploadPictureComponent></UploadPictureComponent>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary" @click="createHandler">创建</button>
+    <div>
+        <div class="modal fade" id="create-demand-modal" tabindex="-1" role="dialog" aria-labelledby="createDemandModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="modal-title" id="createDemandModalTitle">创建需求</span>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body d-flex flex-column">
+                        <div class="d-flex flex-row justify-content-between input-box">
+                            <span>需求标题:</span>
+                            <div>
+                                <textarea v-model="title"></textarea>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row justify-content-between input-box">
+                            <span>需求描述:</span>
+                            <div>
+                                <textarea v-model="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row justify-content-between input-box">
+                            <span>需求类别:</span>
+                            <div class="select-box text-left">
+                                <select v-model="category">
+                                    <option value="1" selected>{{$categoryMap(1)}}</option>
+                                    <option value="2">{{$categoryMap(2)}}</option>
+                                    <option value="3">{{$categoryMap(3)}}</option>
+                                    <option value="4">{{$categoryMap(4)}}</option>
+                                    <option value="4">{{$categoryMap(5)}}</option>
+                                    <option value="4">{{$categoryMap(6)}}</option>
+                                    <option value="4">{{$categoryMap(7)}}</option>
+                                    <option value="4">{{$categoryMap(8)}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row justify-content-between input-box">
+                            <span>需求图片:</span>
+                            <div>
+                                <input type="file" id="file-upload" @change="handleChange($event)" multiple>
+<!--                                    <UploadPictureComponent></UploadPictureComponent>-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="button-basic button-grey" data-dismiss="modal">取消</button>
+                        <button type="button" class="button-basic" @click="createHandler">创建</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -53,9 +56,9 @@
 </template>
 
 <script>
+    // 图片上传机制需要改进
     import UploadPictureComponent from "../../../../components/UploadPictureComponent";
-    import {urlCreateDemand} from "../../../../utils/urls";
-    import dateFormat from "../../../../utils/dateFormat";
+    import {urlCreateDemand, urlDemandImg, urlDemandImg2} from "../../../../utils/urls";
     const msgs = [
         '需求创建成功'
     ]
@@ -67,8 +70,7 @@
                 title: '',
                 description: '',
                 category: '',
-                file_list: [],
-                demand_id: null
+                file: [],
             }
         },
         methods: {
@@ -78,13 +80,27 @@
                     .post(urlCreateDemand, params)
                     .then(response => {
                         console.log(JSON.stringify(response.data));
-                        const data = response.data.data;
-                        if(data && data == 'create success') {
-                            this.showWarning(msgs[0]);
+                        //获取对应的demand_id
+                        const demand_id = response.data.data;
+                        if(demand_id) {
+                            //上传图片
+                            this.uploadImage(demand_id);
                         }
                     })
                     .catch(error => {
                         console.log(error.response.data.error_message);
+                    })
+            },
+            uploadImage(demand_id) {
+                const params = this.initiateImageData(demand_id);
+                this.$axios
+                    .post(urlDemandImg2, params)
+                    .then(response => {
+                        console.log(response.data);
+                        this.showWarning(msgs[0]);
+                    })
+                    .catch(error => {
+                        console.log(error);
                     })
             },
             initiateData() {
@@ -92,31 +108,89 @@
                 params.append('title', this.title);
                 params.append('category', this.category);
                 params.append('description', this.description);
-                params.append('length', this.file_list.length);
                 params.append('user_id', this.getUserId());
                 params.append('update_time', this.getUpdateTime());
                 console.log(`params: ${params}`);
                 return params
+            },
+            initiateImageData(demand_id) {
+                const params = new FormData();
+                for(let i = 0;i < this.file.length;i++) {
+                    params.append('file', this.file[i]);
+                }
+                params.append('demand_id', demand_id);
+                return params;
+            },
+            handleChange(event) {
+                this.file = event.target.files;
             },
             getUserId() {
                 const user_id = this.$store.state.user_info.user_id;
                 console.log(`user_id from vuex: ${user_id}`);
                 return user_id;
             },
-            getDemandId() {
-                return 0;
-            },
             showWarning(msg) {
                 window.alert(msg);
             }
         },
         mounted() {
-            //获取下一个demand_id
-            this.demand_id = this.getDemandId();
+
         }
     }
 </script>
 
 <style scoped>
-
+    @import url(../../../../assets/css/button.css);
+    @import url(../../../../assets/css/input.css);
+    .modal {
+        font-size: 1.6rem;
+    }
+    .modal .modal-content {
+        padding: 1.6rem 1.6rem;
+        border-radius: 8px;
+    }
+    .modal .modal-header {
+        border-bottom: none;
+        font-weight: bold;
+        color: rgba(0, 0, 0, 0.55);
+    }
+    .modal .modal-header .close {
+        font-size: 1.9rem;
+    }
+    .modal .modal-body {
+        font-size: 1.6rem;
+        font-weight: bold;
+        color: rgba(0, 0, 0, 0.65);
+    }
+    .modal .modal-footer {
+        border-top: none;
+    }
+    .modal .button-basic {
+        font-size: 1.4rem;
+    }
+    .input-box {
+        padding: 0.8rem 0;
+    }
+    .input-box span {
+        width: 10rem;
+        font-size: 1.9rem;
+    }
+    .input-box input {
+        width: 30rem;
+        font-size: 1.6rem;
+        border: none;
+        border-radius: 8px;
+        background-color: rgba(244,245,249,1);
+        padding: 0.8rem 1rem;
+    }
+    .input-box textarea {
+        width: 30rem;
+        height: 12rem;
+        padding: 0.8rem 1rem;
+        outline: none;
+        border: 0;
+        border-radius: 8px;
+        background-color: rgba(244,245,249,1);
+        resize: none;
+    }
 </style>

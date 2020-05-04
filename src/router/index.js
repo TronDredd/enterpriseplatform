@@ -10,6 +10,10 @@ import OrderListComponent from "../views/main/function/order/OrderListComponent"
 import OrderDetailComponent from "../views/main/function/order/OrderDetailComponent";
 import CreateOrderComponent from "../views/main/function/order/CreateOrderComponent";
 import OrderStatisticsComponent from "../views/main/function/order/OrderStatisticsComponent";
+import ProductListComponent from "../views/main/function/product/ProductListComponent";
+import MyProductComponent from "../views/main/function/product/MyProductComponent";
+import DemandDetailComponent from "../views/main/function/demand/DemandDetailComponent";
+import DemandDetailSelfComponent from "../views/main/function/demand/DemandDetailSelfComponent";
 
 Vue.use(VueRouter)
 
@@ -46,8 +50,16 @@ const routes = [
         component: DemandListComponent
       },
       {
+        path: 'demand_detail',
+        component: DemandDetailComponent
+      },
+      {
         path: 'my_demand',
         component: MyDemandComponent
+      },
+      {
+        path: 'my_demand_detail',
+        component: DemandDetailSelfComponent
       },
       {
         path: 'order_list',
@@ -64,6 +76,14 @@ const routes = [
       {
         path: 'order_statistics',
         component: OrderStatisticsComponent
+      },
+      {
+        path: 'product_list',
+        component: ProductListComponent
+      },
+      {
+        path: 'my_product',
+        component: MyProductComponent
       }
     ]
   }

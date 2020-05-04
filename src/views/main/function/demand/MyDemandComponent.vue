@@ -1,38 +1,44 @@
 <template>
-    <div id="my-demand" class="bg-white color-grey">
-        <ListHeader list-name="list_name"></ListHeader>
-        <div class="padding-0-1">
-            <div class="d-flex flex-row align-items-center padding-1-0">
-                <button class="btn btn-success btn-sm" @click="createDemandHandler">创建需求</button>
+    <div>
+        <div id="my-demand" class="bg-white d-flex flex-column">
+            <ListHeader :list-name="list_name" :block_color="block_color"></ListHeader>
+            <div class="d-flex flex-row-reverse align-items-center">
+                <button class="button-basic button-green margin-left-8 margin-right-2 margin-bottom-8" @click="createDemandHandler">创建需求</button>
                 <div>
                     <!--      筛选        -->
 
                 </div>
             </div>
-            <div>
-                <DemandSelfComponent v-for="(item, index) in list" :key="index" v-on:demandDetail="showDemandDetailSelf(item)"
+            <div class="demand-box">
+                <DemandSelfComponent v-for="(item, index) in list" :key="index"
+                                     v-on:demandDetail="showDemandDetailSelf(item)"
+                                     v-on:demandDelete="demandDeleteHandler(item)"
                                      :title="item.title"
-                                     :description="item.description">
+                                     :description="item.description"
+                                     :update_time="item.update_time"
+                                     :img_url="item.image_list.length > 0 ? $urlImageBase + item.image_list[0].img : '../assets/logo/png'">
                 </DemandSelfComponent>
             </div>
+            <PagingComponent  v-on:formerPage="formerPage"
+                              v-on:latterPage="latterPage"
+                              v-on:firstPage="firstPage"
+                              v-on:lastPage="lastPage"
+                              v-on:jumpPage="jumpPage"
+                              :page_size = page_size
+                              :page_num = page_num
+                              :number = number
+                              :last_page = last_page>
+            </PagingComponent>
+            <CreateDemandComponent></CreateDemandComponent>
         </div>
-        <PagingComponent  v-on:formerPage="formerPage" v-on:latterPage="latterPage"
-                          :page_size = page_size
-                          :page_num = page_num
-                          :number = number
-                          :last_page = last_page>
-        </PagingComponent>
-        <DemandDetailSelfModal id="demand-detail-modal" :item="selected_item"></DemandDetailSelfModal>
-        <CreateDemandComponent></CreateDemandComponent>
     </div>
 </template>
 
 <script>
     import ListHeader from "../../../../components/ListHeader";
-    import {urlDemandListSelf} from "../../../../utils/urls";
+    import {urlDemandDelete, urlDemandDetailSelf, urlDemandListSelf} from "../../../../utils/urls";
     import DemandSelfComponent from "../../../../components/DemandSelfComponent";
     import PagingComponent from "../../../../components/PagingComponent";
-    import DemandDetailSelfModal from "./DemandDetailSelfModal";
     import CreateDemandComponent from "./CreateDemandModal";
 
     const msgs = [
@@ -43,7 +49,7 @@
 
     export default {
         name: "MyDemandComponent",
-        components: {CreateDemandComponent, DemandSelfComponent, ListHeader, PagingComponent, DemandDetailSelfModal},
+        components: {CreateDemandComponent, DemandSelfComponent, ListHeader, PagingComponent},
         data() {
             return {
                 //列表返回数据
@@ -120,12 +126,47 @@
                 query.page_num++;
                 this.$router.push({query: query});
             },
+            firstPage() {
+                const query = Object.assign({}, this.$route.query);
+                query.page_num = 1;
+                this.$router.push({query: query}).catch(() => {});
+            },
+            lastPage() {
+                const query = Object.assign({}, this.$route.query);
+                query.page_num = this.last_page;
+                this.$router.push({query: query}).catch(() => {});
+            },
+            jumpPage(page_num) {
+                const query = Object.assign({}, this.$route.query);
+                query.page_num = page_num;
+                this.$router.push({query: query}).catch(() => {});
+            },
             showDemandDetailSelf(item) {
                 this.selected_item = item;
-                this.$('#demand-detail-modal').modal('show');
+                const query = {
+                    item: JSON.stringify(item)
+                };
+                this.$router.push({path: 'my_demand_detail', query: query});
             },
             createDemandHandler() {
                 this.$('#create-demand-modal').modal('show');
+            },
+            demandDeleteHandler(item) {
+                console.log(`demand delete, demand_id: ${item.demand_id}`);
+                const params = new URLSearchParams();
+                params.append('demand_id', item.demand_id);
+                this.$axios
+                    .post(urlDemandDelete, params)
+                    .then(response => {
+                        const data = response.data;
+                        if(data && data == 'delete success') {
+                            this.showWarning(data);
+                        //    刷新
+                        }
+                    })
+                    .catch(error => {
+                        this.showWarning(error);
+                    });
             },
             showWarning(msg) {
                 window.alert(msg);
@@ -133,7 +174,10 @@
         },
         computed: {
             list_name() {
-                return 'My Demand';
+                return '我的需求';
+            },
+            block_color() {
+                return 'block-blue';
             }
         },
         watch: {
@@ -152,10 +196,19 @@
 </script>
 
 <style scoped>
-    .padding-1-0 {
-        padding: 1rem 0;
+    @import url(../../../../assets/css/input.css);
+    @import url(../../../../assets/css/button.css);
+    @import url(../../../../assets/css/tool.css);
+    #my-demand {
+        padding: 0 1.2rem 1.8rem;
+        box-shadow: 10px 10px 30px #d9d9d9,
+        -10px -10px 30px #ffffff;
+        border-radius:8px;
+        max-height: 100%;
+        font-size: 1.9rem;
     }
-    .padding-0-1 {
-        padding: 0 1rem;
+    .demand-box {
+        overflow-y: scroll;
+        overflow-x: auto;
     }
 </style>
