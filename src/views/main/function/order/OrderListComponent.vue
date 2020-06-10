@@ -1,54 +1,70 @@
 <template>
-    <div id="order-list-component">
-        <ListHeader :list-name="list_name"></ListHeader>
-        <div class="padding-0-1">
-            <div>
-                <div class="d-flex flex-row-reverse padding-1-0">
-                    <div class="d-flex align-items-center">
-                        <select v-model="filter" class="custom-select-sm">
-                            <option value="0" selected>all</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
+    <div>
+        <div id="order-list-component" class="bg-white d-flex flex-column">
+            <ListHeader :list-name="list_name" :block_color="listBlockColor"></ListHeader>
+            <div class="d-flex flex-row-reverse">
+                <div class="d-flex align-items-center">
+                    <div class="select-box">
+                        <select v-model="filter">
+                            <option value="0" selected>全部</option>
+                            <option value="1">{{ $categoryMap(1) }}</option>
+                            <option value="2">{{ $categoryMap(2) }}</option>
+                            <option value="3">{{ $categoryMap(3) }}</option>
+                            <option value="4">{{ $categoryMap(4) }}</option>
+                            <option value="5">{{ $categoryMap(5) }}</option>
+                            <option value="6">{{ $categoryMap(6) }}</option>
+                            <option value="7">{{ $categoryMap(7) }}</option>
+                            <option value="8">{{ $categoryMap(8) }}</option>
                         </select>
-                        <input v-model="search_content" class="input-control margin-left-4" placeholder="订单搜索">
-                        <button @click="search" class="btn btn-outline-primary btn-sm margin-left-4">搜索</button>
+                    </div>
+                    <div class="input-box">
+                        <input v-model="search_content" class="search-input margin-left-8" placeholder="订单搜索">
+                        <button @click="search" class="button-basic margin-left-8 margin-right-2">搜索</button>
                     </div>
                 </div>
-                <table class="table text-center bg-white">
-                    <thead>
-                       <tr>
-                           <th scope="col">订单编号</th>
-                           <th scope="col">订单标题</th>
-                           <th scope="col">类别</th>
-                           <th scope="col">买入或卖出</th>
-                           <th scope="col">金额</th>
-                           <th scope="col">操作</th>
-                       </tr>
+            </div>
+            <div class="table-div" style="overflow: visible;margin: 0 0 0 -1.2rem;">
+                <table class="table table-borderless text-center table-box">
+                    <thead class="table-thread">
+                    <tr class="row mx-0">
+                        <th scope="col" class="col-2">订单编号</th>
+                        <th scope="col" class="col-2">订单标题</th>
+                        <th scope="col" class="col-2">类别</th>
+                        <th scope="col" class="col-2">买入或卖出</th>
+                        <th scope="col" class="col-2">金额</th>
+                        <th scope="col" class="col-2">操作</th>
+                    </tr>
                     </thead>
+                </table>
+            </div>
+            <div class="table-div">
+                <table class="table table-borderless text-center table-box">
                     <tbody>
                        <tr v-for="(item, index) in list" :key="index">
-                           <th scope="row">{{ item.order_id }}</th>
-                           <td>{{ item.title }}</td>
-                           <td>{{ item.category }}</td>
-                           <td>{{ item.buy_in_or_sell }}</td>
-                           <td>{{ item.money }}</td>
-                           <td>
-                               <button @click="orderDetailHandler(item)" class="btn btn-outline-success btn-sm">查看详情</button>
-                               <button @click="orderDeleteHandler(item.order_id)" class="btn btn-outline-primary btn-sm margin-left-4">删除订单</button>
+                           <th scope="row" class="col-2">{{ item.order_id }}</th>
+                           <td class="col-2">{{ item.title }}</td>
+                           <td class="col-2">{{ $categoryMap(item.category) }}</td>
+                           <td class="col-2">{{ $buyInOrSellMap(item.buy_in_or_sell) }}</td>
+                           <td class="col-2">{{ '￥'+item.money }}</td>
+                           <td class="col-2">
+                               <button @click="orderDetailHandler(item)" class="button-basic">查看详情</button>
+                               <button @click="orderDeleteHandler(item.order_id)" class="button-basic button-grey margin-left-8">删除订单</button>
                            </td>
                        </tr>
                     </tbody>
                 </table>
-                <PagingComponent v-on:formerPage="formerPage" v-on:latterPage="latterPage"
-                                 :page_num = "page_num"
-                                 :page_size = "page_size"
-                                 :list_length="list.length"
-                                 :number = "number"
-                                 :last_page="last_page">
-                </PagingComponent>
             </div>
+            <PagingComponent v-on:formerPage="formerPage" v-on:latterPage="latterPage"
+                             :page_num = "page_num"
+                             :page_size = "page_size"
+                             :list_length="list.length"
+                             :number = "number"
+                             :last_page="last_page">
+            </PagingComponent>
+            <CheckModal modal_id="delete_check_modal"
+                        modal_id_title="delete_check_modal_title"
+                        v-on:delete="deleteHandler()">
+            </CheckModal>
         </div>
     </div>
 </template>
@@ -57,6 +73,8 @@
     import {urlOrderDelete, urlOrderList} from "../../../../utils/urls";
     import ListHeader from "../../../../components/ListHeader";
     import PagingComponent from "../../../../components/PagingComponent";
+    import CheckModal from "../../../../components/CheckModal";
+    import qs from 'qs';
 
     const msgs = [
         '缺少参数',
@@ -66,7 +84,7 @@
     ];
     export default {
         name: "OrderListComponent",
-        components: {ListHeader, PagingComponent},
+        components: {ListHeader, PagingComponent, CheckModal},
         data() {
             return {
                 filter: this.$route.query.filter == undefined ? 0 : Number(this.$route.query.filter),
@@ -80,7 +98,8 @@
                 list: [],
                 total: 0,
 
-                selected_item: {}
+                selected_item: {},
+                selected_delete_order_id: null
             }
         },
         methods: {
@@ -143,24 +162,6 @@
                 console.log(`search: ${JSON.stringify(temp)}`);
                 this.$router.push({query: temp}).catch(() => {});
             },
-            //删除订单记录
-            orderDeleteHandler(order_id) {
-                const query = Object.assign({}, this.$route.query);
-                const params = new URLSearchParams();
-                params.append('order_id', order_id);
-                this.$axios
-                    .post(urlOrderDelete, params)
-                    .then(response => {
-                        const data = response.data.data;
-                        if(data && data == 'delete success') {
-                            this.showWarning(msgs[3]);
-                            this.$router.push({query: query}).catch(() => {});
-                        }
-                    })
-                    .catch(error => {
-                        alert(error);
-                    })
-            },
             routeFetchList(query) {
                 const page_num = query.page_num,
                       page_size = query.page_size,
@@ -185,10 +186,33 @@
             orderDetailHandler(item) {
                 this.selected_item = item;
                 const query = {
-                    item: this.selected_item
+                    item: JSON.stringify(item)
                 }
                 //数据在OrderList阶段已经全部传完，OrderDetail组件无需再重新请求数据
                 this.$router.push({path: '/main/order_detail', query: query});
+            },
+            //删除订单记录
+            orderDeleteHandler(order_id) {
+                this.selected_delete_order_id = order_id;
+                this.$('#delete_check_modal').modal('show');
+            },
+            deleteHandler() {
+                const params = {
+                    order_id: this.selected_delete_order_id
+                };
+                this.$axios
+                    .post(urlOrderDelete, qs.stringify(params))
+                    .then(response => {
+                        const data = response.data.data;
+                        if(data && data == 'delete success') {
+                            this.showWarning(msgs[3]);
+                            //刷新 重新请求
+                            this.routeFetchList(this.$route.query);
+                        }
+                    })
+                    .catch(error => {
+                        alert(error);
+                    })
             },
             showWarning(msg) {
                 alert(msg);
@@ -197,6 +221,9 @@
         computed: {
             list_name() {
                 return '订单列表';
+            },
+            listBlockColor() {
+                return 'block-blue';
             }
         },
         watch: {
@@ -217,10 +244,24 @@
 </script>
 
 <style scoped>
-    .padding-0-1 {
-        padding: 0 1rem;
+    @import url(../../../../assets/css/table.css);
+    @import url(../../../../assets/css/button.css);
+    @import url(../../../../assets/css/tool.css);
+    #order-list-component {
+        padding: 0 1.2rem 1.8rem;
+        /*box-shadow:0px 6px 16px 3px rgba(82,82,82,0.1);*/
+        box-shadow: 10px 10px 30px #d9d9d9,
+        -10px -10px 30px #ffffff;
+        border-radius:8px;
+        max-height: 100%;
+        font-size: 1.9rem;
     }
-    .padding-1-0 {
-        padding: 1rem 0;
+    .input-box .search-input {
+        border: 1px solid #DBDBDB;
+        border-radius: 0.8rem;
+        padding: 0.6rem 1rem;
+    }
+    input {
+        outline: none;
     }
 </style>

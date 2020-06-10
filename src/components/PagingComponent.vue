@@ -85,12 +85,11 @@
     }
     .page-link:hover {
         font-weight: bold;
-        color: #5F5F60;
-        border: 1px solid #8E8E8E;
+        color: #ffffff;
+        background-color: #8E8E8E;
     }
     .page-link:active {
         background-color: #959596;
-        border: 1px solid #959596;
     }
     .page-item:nth-child(3) .page-link{
         border: 1px solid #5A8FFF;

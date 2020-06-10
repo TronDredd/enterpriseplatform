@@ -1,31 +1,24 @@
 <template>
-    <div class="form-content">
-        <h1 class="title">
-            <span class="span-active">LOGIN</span>
-            /
-            <span @click="toRegisterHandler">REGISTER</span>
-        </h1>
-        <div class="nickname-input">
-            <input v-model="user_name" type="text" class="nickname-input_input" placeholder="请输入用户名"/>
+    <div class="login-component">
+        <h1>用户登录</h1>
+        <div class="d-flex flex-column input-box">
+            <span>用户名</span>
+            <div class="gap"></div>
+            <input type="text" v-model="user_name">
         </div>
-        <div class="password-input">
-            <input v-model="password" type="password" class="password-input_input" placeholder="请输入密码"/>
+        <div class="d-flex flex-column input-box">
+            <span>密码</span>
+            <div class="gap"></div>
+            <input type="password" v-model="password">
         </div>
-        <button class="style-button" @click="loginHandler">
-            <span class="style-button_real-text-holder">
-                <span class="style-button_real-text">账号登录</span>
-                <span class="style-button_moving-block face">
-                    <span class="style-button_text-holder">
-                        <span class="style-button_text">账号登录</span>
-                    </span>
-                </span>
-            </span>
-            <span class="style-button_moving-block back">
-                <span class="style-button_text-holder">
-                    <span class="style-button_text">账号登录</span>
-                </span>
-            </span>
-        </button>
+        <div class="checkbox-box d-flex flex-row justify-content-between">
+            <span class="pointer" @click="toRegisterHandler">注册</span>
+            <label class="margin-left-8" for="input-checkbox">
+                <input type="checkbox" id="input-checkbox" v-model="is_remember">
+                <span>记住我</span>
+            </label>
+        </div>
+        <button class="button" @click="loginHandler">登录</button>
     </div>
 </template>
 
@@ -62,6 +55,7 @@
                     this.showWarning(msgs[1]);
                     return;
                 }
+                //POST请求体form-Data中的参数
                 const params = new URLSearchParams();
                 params.append('user_name', user_name);
                 params.append('password', password);
@@ -71,7 +65,6 @@
                         console.log(JSON.stringify(response.data));
                         const data = response.data.data;
                         if(data) {
-                            console.log(JSON.stringify(data));
                             //用户名保存在sessionStorage和vuex中
                             sessionStorage.setItem('user_name', user_name);
                             this.$store.commit('updateUserInfo', data);
@@ -81,8 +74,12 @@
                                     localStorage.setItem('token', data.token);
                                 }
                             }
+                            const query = {page_num: 1, page_size: 20, filter: data.industry, province: 0};
                             //登录成功 跳转至主界面
-                            this.$router.push({name: 'Main'});
+                            this.$router.push({
+                                path: '/main/demand_list',
+                                query: query
+                            });
                         }
                     })
                     .catch(error => {
@@ -120,132 +117,82 @@
 </script>
 
 <style scoped>
-    .form-content {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        opacity: 0;
-        position: relative;
-        /*配合opacity 0*/
-        transform: translateY(10px);
-        /*all指的是所有的变化*/
-        transition: all 0.3s ease 0.7s;
-        flex-direction: column;
+    .login-component {
+        padding: 0 6.7rem 4.5rem;
+        background-color: #ffffff;
+        box-shadow: -2.7rem 2.7rem 0 #221D7A;
+        border-radius: 1.6rem;
+        opacity: 1;
+        transition: all 0.4s ease 0.2s;
+        backface-visibility: hidden;
+        transform: perspective(600px) rotateY(0deg);
     }
-    .title {
-        font-size: 16px;
-        color: #714cab;
-        letter-spacing: 3px;
-        text-shadow: 0 0 5px;
+    /*.login-component:hover {*/
+    /*    transform: perspective(600px) rotateY(180deg);*/
+    /*}*/
+    .login-component h1 {
+        padding: 7.8rem 0 4rem;
+        font-size: 3.2rem;
+        font-weight: bold;
+        color: #5A8FFF;
+        text-align: center;
+        letter-spacing: 0.8rem;
     }
-    .title span {
-        cursor: pointer;
+    .input-box {
+        margin-top: 3rem;
+        padding-bottom: .4rem;
+        border-bottom: 1px solid #D8D8D8;
     }
-    .span-active {
-        font-size: 36px;
-        color: rgba(255, 255, 255, 0.4);
+    .input-box .gap {
+        height: .6rem;
     }
-    .form-content input {
-        width: 100%;
-        -webkit-appearance: none;
-        border: none;
-        font-size: 14px;
-        background: none;
-        letter-spacing: 3.5px;
-        font-weight: 600;
-        padding: 12px 16px;
+    .input-box span {
+        line-height: 2rem;
+        font-size: 1.7rem;
+        font-weight: 400;
+        color: #6C6C72;
     }
-    .form-content input:focus {
+    .input-box input {
+        width: 38rem;
+        line-height: 4.6rem;
+        font-size: 2rem;
         outline: none;
-    }
-    .form-content input::-webkit-input-placeholder {
-        color: #ffffff;
-        text-shadow: 0 0 5px;
-    }
-    .nickname-input, .password-input {
-        width: 100%;
-        position: relative;
-        margin-bottom: 25px;
-        border-radius: 5px;
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    .style-button {
-        cursor: pointer;
-        -webkit-appearance: none;
-        -webkit-user-select: none;
-        font-size: 14px;
-        width: 100%;
-        outline: none;
-        background: none;
         border: none;
-        text-transform: uppercase;
-        padding: 12px 20px;
-        position: relative;
-        letter-spacing: 10px;
-        transition: all 0.3s ease;
-        overflow: hidden;
-        background: #714cab;
-        border-radius: 3px;
-        color: #492e72;
-        font-weight: 600;
-        margin-bottom: 25px;
+        letter-spacing: .6rem;
     }
-    .style-button:hover,.style-button:active {
-        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        background: #714cab;
+    .input-box input:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+        -webkit-text-fill-color: #000000;
+        font-family: Montserrat-Regular;
+        font-size: 2rem;
     }
-    .style-button_real-text-holder {
-        position: relative;
+    .checkbox-box {
+        margin: 1rem 0;
+        text-align: right;
+        vertical-align: middle;
+        line-height: 2rem;
+        font-size: 1.7rem;
+        font-weight: 400;
+        color: #6C6C72;
     }
-    .style-button_real-text {
-        color: transparent;
-        display: inline-block;
+    .checkbox-box > span:hover {
+        color: #5A8FFF;
     }
-    .style-button_text-holder {
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
+    .button {
         width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: all 1s ease;
-    }
-    .style-button_moving-block {
-        transition: all 1s ease;
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 100%;
-        overflow: hidden;
-    }
-    .style-button_moving-block.back {
+        margin: 0 0 2rem;
+        padding: 1.3rem 0;
+        outline: none;
+        border: none;
+        border-radius: .8rem;
+        background-color: #5A8FFF;
+        font-size: 1.7rem;
+        letter-spacing: 1.2rem;
         color: #ffffff;
-        transform: translateX(-100%);
+        text-align: center;
+        transition: 0.6s;
     }
-    .style-button_moving-block.back .style-button_text-holder {
-        transform: translateX(100%);
-    }
-    .style-button:hover .face,
-    .style-button:active .face {
-        transform: translateX(100%);
-    }
-    .style-button:hover .face .style-button_text-holder,
-    .style-button:active .face .style-button_text-holder {
-        transform: translateX(-100%);
-    }
-    .style-button:hover .back,
-    .style-button:active .back {
-        transform: translateX(0);
-    }
-    .style-button:active .back .style-button_text-holder,
-    .style-button:hover .back .style-button_text-holder{
-        transform: translateX(0);
-    }
-    .style-button_text-holder:active {
-        box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    .button:hover {
+        background-color: #221D7A;
     }
 </style>

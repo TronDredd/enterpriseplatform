@@ -1,31 +1,37 @@
 <template>
     <div>
-        <div class="modal fade" id="create-demand-modal" tabindex="-1" role="dialog" aria-labelledby="createDemandModalTitle" aria-hidden="true">
+        <div class="modal fade" id="create-product-modal" tabindex="-1" role="dialog" aria-labelledby="createProductModalTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <span class="modal-title" id="createDemandModalTitle">创建需求</span>
+                        <span class="modal-title" id="createProductModalTitle">新增产品</span>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body d-flex flex-column">
                         <div class="d-flex flex-row justify-content-between input-box">
-                            <span>需求标题:</span>
+                            <span>产品名称:</span>
                             <div>
-                                <textarea v-model="title"></textarea>
+                                <input v-model="product_name"/>
                             </div>
                         </div>
                         <div class="d-flex flex-row justify-content-between input-box">
-                            <span>需求描述:</span>
+                            <span>产品定价:</span>
                             <div>
-                                <textarea v-model="description"></textarea>
+                                <input v-model="product_price"/>
                             </div>
                         </div>
                         <div class="d-flex flex-row justify-content-between input-box">
-                            <span>需求类别:</span>
+                            <span>单位:</span>
+                            <div>
+                                <input v-model="unit"/>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row justify-content-between input-box">
+                            <span>产品类别:</span>
                             <div class="select-box text-left">
-                                <select v-model="category">
+                                <select v-model="product_category">
                                     <option value="1" selected>{{$categoryMap(1)}}</option>
                                     <option value="2">{{$categoryMap(2)}}</option>
                                     <option value="3">{{$categoryMap(3)}}</option>
@@ -38,7 +44,7 @@
                             </div>
                         </div>
                         <div class="d-flex flex-row justify-content-between input-box">
-                            <span>需求图片:</span>
+                            <span>产品图片:</span>
                             <div>
                                 <input type="file" id="file-upload" @change="handleChange($event)" multiple>
 <!--                                    <UploadPictureComponent></UploadPictureComponent>-->
@@ -47,7 +53,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="button-basic button-grey" data-dismiss="modal">取消</button>
-                        <button type="button" class="button-basic" @click="createHandler">创建</button>
+                        <button type="button" class="button-basic" @click="createHandler">确定</button>
                     </div>
                 </div>
             </div>
@@ -58,18 +64,19 @@
 <script>
     // 图片上传机制需要改进
     import UploadPictureComponent from "../../../../components/UploadPictureComponent";
-    import {urlCreateDemand, urlDemandImg2} from "../../../../utils/urls";
+    import {urlCreateProduct, urlProductImg2} from "../../../../utils/urls";
     const msgs = [
         '需求创建成功'
     ]
     export default {
-        name: "CreateDemandComponent",
+        name: "CreateProductComponent",
         components: {UploadPictureComponent},
         data() {
             return {
-                title: '',
-                description: '',
-                category: '',
+                product_name: '',
+                product_price: '',
+                unit: '',
+                product_category: '',
                 file: [],
             }
         },
@@ -78,26 +85,26 @@
                 //获取POST请求的参数
                 const params = this.initiateData();
                 this.$axios
-                    .post(urlCreateDemand, params)
+                    .post(urlCreateProduct, params)
                     .then(response => {
                         console.log(JSON.stringify(response.data));
-                        //获取对应的demand_id
-                        const demand_id = response.data.data;
-                        if(demand_id) {
+                        //获取对应的product_id
+                        const product_id = response.data.data;
+                        if(product_id) {
                             //上传图片
-                            this.uploadImage(demand_id);
+                            this.uploadImage(product_id);
                         }
                     })
                     .catch(error => {
                         console.log(error.response.data.error_message);
                     })
             },
-            uploadImage(demand_id) {
-                //demand_id是让图片和需求存储时绑定
+            uploadImage(product_id) {
+                //product_id是让图片和需求存储时绑定
                 //获取POST请求的参数，此处为图片文件
-                const params = this.initiateImageData(demand_id);
+                const params = this.initiateImageData(product_id);
                 this.$axios
-                    .post(urlDemandImg2, params)
+                    .post(urlProductImg2, params)
                     .then(response => {
                         console.log(response.data);
                         this.showWarning(msgs[0]);
@@ -108,21 +115,21 @@
                     })
             },
             initiateData() {
-                const params = new FormData()
-                params.append('title', this.title);
-                params.append('category', this.category);
-                params.append('description', this.description);
+                const params = new FormData();
+                params.append('product_name', this.product_name);
+                params.append('product_category', this.product_category);
+                params.append('product_price', this.product_price);
                 params.append('user_id', this.getUserId());
-                params.append('update_time', this.getUpdateTime());
+                params.append('unit', this.unit);
                 console.log(`params: ${params}`);
                 return params
             },
-            initiateImageData(demand_id) {
+            initiateImageData(product_id) {
                 const params = new FormData();
                 for(let i = 0;i < this.file.length;i++) {
                     params.append('file', this.file[i]);
                 }
-                params.append('demand_id', demand_id);
+                params.append('product_id', product_id);
                 return params;
             },
             handleChange(event) {

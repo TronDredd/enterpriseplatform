@@ -1,16 +1,23 @@
 <template>
-    <div id="order-statistics-component">
-        <div class="top-title bg-white">
-            <span>订单统计</span>
-        </div>
-        <div>
-            <div>
-                <select v-model="time_category">
-                    <option value="month" selected>本月</option>
-                    <option value="last month">上月</option>
-                    <option value="year">本年</option>
-                    <option value="last year">上年</option>
-                </select>
+    <div>
+        <div id="order-statistics-component" class="bg-white d-flex flex-column">
+            <ListHeader :list-name="list_name" :block_color="block_color"></ListHeader>
+            <div class="d-flex flex-row-reverse options-box">
+                <div class="select-box margin-left-8">
+                    <!--金额统计图-->
+                    <select v-model="chart_category">
+                        <option value="order_number" selected>订单数量统计图</option>
+                        <option value="order_money">订单金额统计图</option>
+                    </select>
+                </div>
+                <div class="select-box">
+                    <select v-model="time_category">
+                        <option value="month" selected>本月</option>
+                        <option value="last month">上月</option>
+                        <option value="year">本年</option>
+                        <option value="last year">上年</option>
+                    </select>
+                </div>
             </div>
             <div id="order-echarts">
 
@@ -21,6 +28,7 @@
 
 <script>
     import {urlOrderQuery} from "../../../../utils/urls";
+    import ListHeader from "../../../../components/ListHeader";
 
     const chart_titles = [
         '本月订单数统计图',
@@ -46,54 +54,27 @@
         }
         return result;
     };
-    const count = (list, unit, category) => {
-        console.log(`start count: ${unit}, ${category}`)
-        let result = 0, unit_now;
-        list.forEach((item) => {
-            switch (category) {
-                case 'month':
-                    unit_now = new Date(item.update_time).getDate();
-                    console.log(`day_now: ${unit_now}`);
-                    if(unit_now == unit) {
-                        result++;
-                    }
-                    break;
-                case 'year':
-                    unit_now = Number(new Date(item.update_time).getMonth()) + 1;
-                    console.log(`month now: ${unit_now}`)
-                    if(unit_now == unit) {
-                        result++;
-                    }
-                    break;
-                case 'last month':
-                    unit_now = Number(new Date(item.update_time).getDate());
-                    if(unit_now == unit) {
-                        result++;
-                    }
-                    break;
-                case 'last year':
-                    unit_now = Number(new Date(item.update_time).getMonth()) + 1;
-                    if(unit_now == unit) {
-                        result++;
-                    }
-            }
-        })
-        return result;
-    }
     export default {
         name: "OrderStatisticsComponent",
+        components: {ListHeader},
         data() {
             return {
                 query_time: this.$route.query.query_time == undefined ? null : this.$route.query.query_time,
                 time_category: this.$route.query.time_category == undefined ? null : this.$route.query.time_category,
-                buy_in_or_sell: this.$route.query.buy_in_or_sell == undefined ? 1 : Number(this.$route.query.buy_in_or_sell),
 
+                chart_category: this.$route.query.chart_category == undefined ? 'order_number' : this.$route.query.chart_category,
                 chart_title: null,
 
-                list: [],
+                buy_list: [],
+                sell_list: [],
                 x_data: [],
                 y_data: [],
-                chart_data: [],
+                sell_chart_number: [],
+                buy_chart_number: [],
+                sell_chart_data: [],
+                buy_chart_data: [],
+                income_chart_data: [],
+                expense_chart_data: [],
                 show_chart: false,
             }
         },
@@ -102,10 +83,12 @@
                 this.$axios
                     .get(url, params)
                     .then(response => {
-                        const data = response.data.data;
-                        if(data) {
-                            console.log(`order statistics: ${JSON.stringify(data)}`);
-                            this.list = data;
+                        const buy_data = response.data.buy_data;
+                        const sell_data = response.data.sell_data;
+                        if(buy_data && sell_data) {
+                            console.log(`order statistics: ${JSON.stringify(buy_data)}, ${JSON.stringify(sell_data)}`);
+                            this.buy_list = buy_data;
+                            this.sell_list = sell_data;
                             this.initiateChartData();
                             this.show_chart = true;
                             this.initiateChart();
@@ -115,12 +98,11 @@
                         console.log(error);
                     })
             },
-            fetchList(query_time, time_category, buy_in_or_sell) {
+            fetchList(query_time, time_category) {
                 const params = {
                     params: {
                         query_time: query_time,
-                        time_category: time_category,
-                        buy_in_or_sell: buy_in_or_sell
+                        time_category: time_category
                     }
                 }
                 this.getMethod(urlOrderQuery, params);
@@ -128,68 +110,266 @@
             routeToFetch(query) {
                 this.query_time = query.query_time;
                 this.time_category = query.time_category;
-                this.buy_in_or_sell = Number(query.buy_in_or_sell);
+                this.chart_category = query.chart_category;
                 this.chart_title = judgeTitle(this.time_category);
-                this.fetchList(this.query_time, this.time_category, this.buy_in_or_sell);
+                this.fetchList(this.query_time, this.time_category);
             },
             initiateChart() {
                 console.log(`initiate chart`);
                 const echart_element = document.getElementById('order-echarts');
-                console.log(`echart element: ${echart_element}`);
                 let my_chart = this.$echarts.init(echart_element);
-                my_chart.setOption({
+                let series = [];
+                if(this.chart_category === 'order_number') {
+                    series = [{
+                        name: '卖出订单数量',
+                        type: 'bar',
+                        data: this.sell_chart_number
+                    }, {
+                        name: '买进订单数量',
+                        type: 'bar',
+                        data: this.buy_chart_number
+                    }];
+                } else {
+                    series = [{
+                        name: '卖出订单金额',
+                        type: 'bar',
+                        data: this.sell_chart_data
+                    }, {
+                        name: '买进订单金额',
+                        type: 'bar',
+                        data: this.buy_chart_data
+                    }, {
+                        name: '净收入',
+                        type: 'bar',
+                        data: this.income_chart_data
+                    },{
+                        name: '净支出',
+                        type: 'bar',
+                        data: this.expense_chart_data
+                    }];
+                }
+                //统计图配置项
+                const options = {
                     title: { text:  this.chart_title},
                     tooltip: {},
+                    toolbox: {
+                        show: true,
+                        itemSize: 22,
+                        feature: {
+                            magicType: {
+                                type: ['line', 'bar']
+                            }
+                        }
+                    },
+                    legend: {//图例
+                        x: 'left',
+                        top: "6%",
+                    },
                     xAxis: {
-                        data: this.x_data
+                        type: "category",
+                        data: this.x_data,
+                        axisTick: {
+                            alignWithLabel: true
+                        }
                     },
                     yAxis: {
-                        data: this.y_data
+                        data: this.y_data,
+                        axisTick: {
+                            alignWithLabel: true
+                        },
+                        //从原点开始
+                        boundaryGap: false,
+                        //分隔线
+                        splitLine: {
+                            show: true
+                        }
                     },
-                    series: [{
-                        name: '数量',
-                        type: 'bar',
-                        data: this.chart_data
-                    }]
-                });
+                    series: series
+                };
+                my_chart.setOption(options);
             },
             initiateChartData() {
                 console.log('initiate chart data');
-                let x_data = [], y_data = [0,1,2,3,4], chart_data = [], month, day;
+                let x_data = [], y_data = [], count_max = 0, sell_chart_data = [], buy_chart_data = [], month, day, i_day = 0, i_month = 0;
                 switch (this.time_category) {
                     case 'month':
-                        day = Number(new Date(this.query_time).getDate());
-                        console.log(`day: ${day}`)
-                        for(let i = 0;i < day;i++) {
+                        day = this.getDateNumber(this.query_time);
+                        console.log(`day: ${day}`);
+                        //创建指定长度的数组 day 1开始
+                        buy_chart_data = new Array(day).fill(0);
+                        sell_chart_data = new Array(day).fill(0);
+                        for(let i = 0; i < day;i++) {
                             x_data[i] = `${i + 1}日`;
-                            chart_data[i] = count(this.list, i + 1, this.time_category);
                         }
+                        for(let i = 0;i < this.buy_list.length;i++) {
+                            i_day = this.getDateNumber(this.buy_list[i].update_time);
+                            buy_chart_data[i_day - 1]++;
+                        }
+                        for(let i = 0;i < this.sell_list.length;i++) {
+                            i_day = this.getDateNumber(this.sell_list[i].update_time);
+                            sell_chart_data[i_day - 1]++;
+                        }
+                        console.log(sell_chart_data);
                         break;
                     case 'year':
-                        month = Number(new Date(this.query_time).getMonth()) + 1;
+                        // month 1开始
+                        month = this.getMonthNumber(this.query_time);
                         console.log(`month: ${month}`);
-                        for(let i = 0;i < month;i++) {
+                        buy_chart_data = new Array(month).fill(0);
+                        sell_chart_data = new Array(month).fill(0);
+                        for(let i = 0; i < month;i++) {
                             x_data[i] = `${i + 1}月`;
-                            chart_data[i] = count(this.list, i + 1, this.time_category);
+                        }
+                        for(let i = 0;i < this.buy_list.length;i++) {
+                            i_month = this.getMonthNumber(this.buy_list[i].update_time);
+                            buy_chart_data[i_month - 1]++;
+                        }
+                        for(let i = 0;i < this.sell_list.length;i++) {
+                            i_month = this.getMonthNumber(this.sell_list[i].update_time);
+                            sell_chart_data[i_month - 1]++;
                         }
                         break;
                     case 'last month':
-                        month = (Number(new Date(this.query_time).getMonth()) + 1) == 1 ? 12 : Number(new Date(this.query_time).getMonth());
+                        month = (this.getMonthNumber(this.query_time) + 1) == 1 ? 12 : this.getMonthNumber(this.query_time) + 1;
                         console.log(`month: ${month}`);
-                        for(let i = 0;i < 31;i++) {
-                            x_data[i] = `${i + 1}月`;
-                            chart_data[i] = count(this.list, i + 1, this.time_category);
+                        buy_chart_data = new Array(31).fill(0);
+                        sell_chart_data = new Array(31).fill(0);
+                        for(let i = 0; i < 31;i++) {
+                            x_data[i] = `${i + 1}日`;
+                        }
+                        for(let i = 0;i < this.buy_list.length;i++) {
+                            i_day = this.getDateNumber(this.buy_list[i].update_time);
+                            buy_chart_data[i_day - 1]++;
+                        }
+                        for(let i = 0;i < this.sell_list.length;i++) {
+                            i_day = this.getDateNumber(this.sell_list[i].update_time);
+                            sell_chart_data[i_day - 1]++;
                         }
                         break;
                     case 'last year':
-                        for(let i = 0;i < 12;i++) {
+                        buy_chart_data = new Array(month).fill(0);
+                        sell_chart_data = new Array(month).fill(0);
+                        for(let i = 0; i < 12;i++) {
                             x_data[i] = `${i + 1}月`;
-                            chart_data[i] = count(this.list, i + 1, this.time_category);
                         }
+                        for(let i = 0;i < this.buy_list.length;i++) {
+                            i_month = this.getMonthNumber(this.buy_list[i].update_time);
+                            buy_chart_data[i_month - 1]++;
+                        }
+                        for(let i = 0;i < this.sell_list.length;i++) {
+                            i_month = this.getMonthNumber(this.sell_list[i].update_time);
+                            sell_chart_data[i_month - 1]++;
+                        }
+                }
+                count_max = Math.max(...buy_chart_data, ...sell_chart_data, 4);
+                for(let i = 0;i <= count_max;i++) {
+                    y_data[i] = i;
                 }
                 this.x_data = x_data;
                 this.y_data = y_data;
-                this.chart_data = chart_data;
+                this.sell_chart_number = sell_chart_data;
+                this.buy_chart_number = buy_chart_data;
+            },
+            initiateChartMoneyData() {
+                console.log('initiate chart money data');
+                let x_data = [], y_data = [], count_max = 0,
+                    sell_chart_data = [], buy_chart_data = [], income_chart_data = [],
+                    month, day, i_day = 0, i_month = 0;
+                switch (this.time_category) {
+                    case 'month':
+                        day = this.getDateNumber(this.query_time);
+                        console.log(`day: ${day}`);
+                        //创建指定长度的数组 day 1开始
+                        buy_chart_data = new Array(day).fill(0);
+                        sell_chart_data = new Array(day).fill(0);
+                        income_chart_data = new Array(day).fill(0);
+                        for(let i = 0; i < day;i++) {
+                            x_data[i] = `${i + 1}日`;
+                        }
+                        for(let i = 0;i < this.buy_list.length;i++) {
+                            i_day = this.getDateNumber(this.buy_list[i].update_time);
+                            buy_chart_data[i_day - 1] = this.buy_list[i].money;
+                        }
+                        for(let i = 0;i < this.sell_list.length;i++) {
+                            i_day = this.getDateNumber(this.sell_list[i].update_time);
+                            console.log(`i_day: ${i_day}`)
+                            sell_chart_data[i_day - 1] = this.sell_list[i].money;
+                            income_chart_data[i_day - 1] = this.sell_list[i].money - this.buy_list[i].money;
+                        }
+                        console.log(sell_chart_data, buy_chart_data);
+                        break;
+                    case 'last month':
+                        //创建指定长度的数组 day 1开始
+                        buy_chart_data = new Array(31).fill(0);
+                        sell_chart_data = new Array(31).fill(0);
+                        income_chart_data = new Array(31).fill(0);
+                        for(let i = 0; i < day;i++) {
+                            x_data[i] = `${i + 1}日`;
+                        }
+                        for(let i = 0;i < this.buy_list.length;i++) {
+                            i_day = this.getDateNumber(this.buy_list[i].update_time);
+                            buy_chart_data[i_day - 1] = this.buy_list[i].money;
+                        }
+                        for(let i = 0;i < this.sell_list.length;i++) {
+                            i_day = this.getDateNumber(this.sell_list[i].update_time);
+                            sell_chart_data[i_day - 1] = this.sell_list[i].money;
+                            income_chart_data[i_day - 1] = this.sell_list[i].money - this.buy_list[i].money;
+                        }
+                        console.log(sell_chart_data);
+                        break;
+                    case 'year':
+                        month = this.getMonthNumber(this.query_time);
+                        console.log(`month: ${month}`);
+                        buy_chart_data = new Array(month).fill(0);
+                        sell_chart_data = new Array(month).fill(0);
+                        income_chart_data = new Array(month).fill(0);
+                        for(let i = 0; i < month;i++) {
+                            x_data[i] = `${i + 1}月`;
+                        }
+                        for(let i = 0;i < this.buy_list.length;i++) {
+                            i_month = this.getMonthNumber(this.buy_list[i].update_time);
+                            buy_chart_data[i_month - 1] = this.buy_list[i].money;
+                        }
+                        for(let i = 0;i < this.sell_list.length;i++) {
+                            i_month = this.getMonthNumber(this.sell_list[i].update_time);
+                            sell_chart_data[i_month - 1] = this.sell_list[i].money;
+                            income_chart_data[i_month - 1] = this.sell_list[i].money - this.buy_list[i].money;
+                        }
+                        break;
+                    case 'last year':
+                        buy_chart_data = new Array(12).fill(0);
+                        sell_chart_data = new Array(12).fill(0);
+                        income_chart_data = new Array(12).fill(0);
+                        for(let i = 0; i < 12;i++) {
+                            x_data[i] = `${i + 1}月`;
+                        }
+                        for(let i = 0;i < this.buy_list.length;i++) {
+                            i_month = this.getMonthNumber(this.buy_list[i].update_time);
+                            buy_chart_data[i_month - 1] = this.buy_list[i].money;
+                        }
+                        for(let i = 0;i < this.sell_list.length;i++) {
+                            i_month = this.getMonthNumber(this.sell_list[i].update_time);
+                            sell_chart_data[i_month - 1] = this.sell_list[i].money;
+                            income_chart_data[i_month - 1] = this.sell_list[i].money - this.buy_list[i].money;
+                        }
+                        break;
+                }
+                count_max = Math.max(...buy_chart_data, ...sell_chart_data);
+                for(let i = 0;i <= count_max;i++) {
+                    y_data[i] = i;
+                }
+                this.x_data = x_data;
+                this.y_data = y_data;
+                this.sell_chart_data = sell_chart_data;
+                this.buy_chart_data = buy_chart_data;
+                this.income_chart_data = income_chart_data;
+                this.expense_chart_data = income_chart_data.map(item => item * -1);
+            },
+            getDateNumber(time) {
+                return Number(new Date(time).getDate());
+            },
+            getMonthNumber(time) {
+                return Number(new Date(time).getMonth());
             }
         },
         watch: {
@@ -200,27 +380,54 @@
                 console.log(`time_category has been changed: ${newVal}`);
                 const query = Object.assign({}, this.$route.query);
                 query.time_category = newVal;
+                query.chart_category = this.chart_category;
                 this.$router.push({query: query}).catch(() => {});
+            },
+            chart_category() {
+                this.show_chart = false;
+                if(this.chart_category === 'order_number') {
+                    this.initiateChartData();
+                } else {
+                    this.initiateChartMoneyData();
+                }
+                this.initiateChart();
+                this.show_chart = true;
+            }
+        },
+        computed: {
+            list_name() {
+                return '订单统计';
+            },
+            block_color() {
+                return 'block-blue';
             }
         },
         mounted() {
             const query = this.$route.query;
             this.routeToFetch(query);
-            // this.initiateChart();
         }
     }
 </script>
 
 <style scoped>
+    @import url(../../../../assets/css/input.css);
     #order-statistics-component {
-        margin: .6rem 1rem;
+        padding: 0 1.2rem 1.8rem;
+        box-shadow: 10px 10px 30px #d9d9d9,
+        -10px -10px 30px #ffffff;
+        border-radius:8px;
+        max-height: 100%;
+        font-size: 1.9rem;
     }
-    .top-title {
-        display: inline-block;
-        padding: .6rem 1rem;
+    .options-box {
+        width: 60%;
+        min-width: 600px;
+        margin: 0 auto 1rem auto;
     }
     #order-echarts {
-        width: 600px;
+        width: 60%;
+        min-width: 600px;
         height: 600px;
+        margin: 0 auto;
     }
 </style>

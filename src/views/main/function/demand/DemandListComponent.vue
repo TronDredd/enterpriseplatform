@@ -1,10 +1,16 @@
 <template>
     <div>
-        <div id="demand-list" class="bg-white  d-flex flex-column">
+        <div id="demand-list" class="bg-white d-flex flex-column">
             <ListHeader :list-name="list_name" :block_color="block_color"></ListHeader>
             <div class="d-flex flex-row-reverse margin-bottom-8">
                 <div class="d-flex flex-row">
                     <div class="select-box">
+                        <!--省份-->
+                        <select v-model="province">
+                            <option :value=item.index v-for="(item) in province_arr" :key="item.index">{{ item.value }}</option>
+                        </select>
+                    </div>
+                    <div class="select-box margin-left-8">
                     <!--        第一版简单分类            -->
                         <select v-model="filter">
                             <option value=0 selected>{{ $categoryMap(0) }}</option>
@@ -25,10 +31,12 @@
                 </div>
             </div>
             <div class="demand-box">
-                <DemandComponent v-for="(item, index) in list" :key="index" v-on:demandDetail="showDemandDetail(item)"
+                <DemandComponent v-for="(item, index) in list" :key="index"
+                                 v-on:userDetail="showUserDetail(item)"
+                                 v-on:demandDetail="showDemandDetail(item)"
                                  :title="item.title"
                                  :description="item.description"
-                                 :user_name="item.user_name"
+                                 :user_company="item.company_name"
                                  :img_url="item.image_list.length > 0 ? $urlImageBase + item.image_list[0].img : '../assets/logo.png'">
                 </DemandComponent>
             </div>
@@ -52,12 +60,8 @@
     import DemandComponent from "../../../../components/DemandComponent";
     import PagingComponent from "../../../../components/PagingComponent";
     import {urlDemandDetail, urlDemandList} from "../../../../utils/urls";
+    import provinceArr from "../../../../utils/province";
 
-    const msgs = [
-        '缺少参数',
-        '其他异常',
-        '查询结果为空'
-    ];
     export default {
         name: "DemandListComponent",
         components: {PagingComponent, DemandComponent, ListHeader},
@@ -65,6 +69,7 @@
             return {
                 filter: 0,
                 search_content: '',
+                province: 0,
 
                 //列表返回数据
                 list: [],
@@ -76,7 +81,8 @@
                 number: 0,   //the number of records in current page
                 last_page: 0,
 
-                selected_item: {}
+                selected_item: {},
+                province_arr: provinceArr
             }
         },
         methods: {
@@ -95,20 +101,8 @@
                             this.number = list.length;
                             this.last_page = Math.ceil(total/this.page_size);
                         } else {
-                            this.showWarning(msgs[2]);
+                            this.$alert('查询结果为空');
                             this.$router.back();
-                        }
-                    })
-                    .catch(error => {
-                        const error_code = error.response.data.error_code;
-                        if(error_code) {
-                            switch (error_code) {
-                                case '400101':
-                                    this.showWarning(msgs[0]);
-                                    break;
-                                default:
-                                    this.showWarning(msgs[1]);
-                            }
                         }
                     })
             },
@@ -117,13 +111,15 @@
                 const page_num = this.$route.query.page_num,
                     page_size = this.$route.query.page_size,
                     filter = this.$route.query.filter,
+                    province = this.$route.query.province,
                     search_content = this.$route.query.search_content;
 
                 const params = {
                     params: {
                         page_num: page_num,
                         page_size: page_size,
-                        filter: filter
+                        filter: filter,
+                        province: province
                     }
                 };
                 if(search_content != undefined) {
@@ -167,15 +163,27 @@
                 query.page_num = page_num;
                 this.$router.push({query: query}).catch(() => {});
             },
-            showWarning(msg) {
-                window.alert(msg);
-            },
             initiateData(query) {
                 //data数据赋值
                 this.page_num = query.page_num;
                 this.page_size = query.page_size;
                 this.filter = query.filter;
+                this.province = query.province;
                 this.search_content = query.search_content == undefined ? '' : query.search_content;
+            },
+            showUserDetail(item) {
+                const params = {
+                    user_id: item.user_id,
+                    user_name: item.user_name,
+                    company_name: item.company_name,
+                    address: item.address,
+                    telephone: item.telephone,
+                    industry: item.industry
+                };
+                const query = {
+                    item: JSON.stringify(params)
+                };
+                this.$router.push({path: '/main/user_info', query: query});
             },
             showDemandDetail(item) {
                 this.selected_item = item;
@@ -197,6 +205,12 @@
                 const query = Object.assign({}, this.$route.query);
                 query.filter = newVal;
                 this.$router.push({query: query}).catch(() => {});
+            },
+            province: function(newVal) {
+                console.log('province has changed');
+                const query = Object.assign({}, this.$route.query);
+                query.province = newVal;
+                this.$router.push({query: query}).catch(() => {});
             }
         },
         computed: {
@@ -207,9 +221,14 @@
                 return 'block-blue';
             }
         },
-        mounted() {
-            // 赋值data 用于页面显示
+        mounted() {//mounted生命周期函数
+            console.log('Demand list mounted');
+            setTimeout(() => {
+                document.body.classList.add("document-loaded")
+            }, 100);
+            // 赋值data 将路由对象route中的参数赋给组件的data
             this.initiateData(this.$route.query);
+            //发送请求
             this.sendRequest();
         }
     }
@@ -226,6 +245,13 @@
         border-radius:8px;
         max-height: 100%;
         font-size: 1.9rem;
+        transform: translateY(4%);
+        opacity: 0;
+        transition: all .4s linear .2s;
+    }
+    .document-loaded #demand-list {
+        transform: translateY(0);
+        opacity: 1;
     }
     .demand-box {
         overflow-y: scroll;

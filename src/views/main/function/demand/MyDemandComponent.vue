@@ -29,17 +29,23 @@
                               :number = number
                               :last_page = last_page>
             </PagingComponent>
-            <CreateDemandComponent></CreateDemandComponent>
+            <CreateDemandComponent v-on:createSuccessEvent="createSuccessHandler"></CreateDemandComponent>
+            <CheckModal modal_id="delete_check_modal"
+                        modal_id_title="delete_check_modal_title"
+                        v-on:delete="deleteHandler()">
+            </CheckModal>
         </div>
     </div>
 </template>
 
 <script>
     import ListHeader from "../../../../components/ListHeader";
-    import {urlDemandDelete, urlDemandDetailSelf, urlDemandListSelf} from "../../../../utils/urls";
+    import {urlDemandDelete, urlDemandListSelf} from "../../../../utils/urls";
     import DemandSelfComponent from "../../../../components/DemandSelfComponent";
     import PagingComponent from "../../../../components/PagingComponent";
     import CreateDemandComponent from "./CreateDemandModal";
+    import CheckModal from "../../../../components/CheckModal";
+    import qs from 'qs';
 
     const msgs = [
         '缺少参数',
@@ -49,7 +55,7 @@
 
     export default {
         name: "MyDemandComponent",
-        components: {CreateDemandComponent, DemandSelfComponent, ListHeader, PagingComponent},
+        components: {CheckModal, CreateDemandComponent, DemandSelfComponent, ListHeader, PagingComponent},
         data() {
             return {
                 //列表返回数据
@@ -63,6 +69,7 @@
                 last_page: 0,
 
                 selected_item: {},
+                selected_delete_demand_id: null
             }
         },
         methods: {
@@ -152,21 +159,34 @@
                 this.$('#create-demand-modal').modal('show');
             },
             demandDeleteHandler(item) {
-                console.log(`demand delete, demand_id: ${item.demand_id}`);
-                const params = new URLSearchParams();
-                params.append('demand_id', item.demand_id);
+                this.selected_delete_demand_id = item.demand_id;
+                this.$('#delete_check_modal').modal('show');
+            },
+            deleteHandler() {
+                const params = {
+                    demand_id: this.selected_delete_demand_id
+                };
                 this.$axios
-                    .post(urlDemandDelete, params)
+                    .post(urlDemandDelete, qs.stringify(params))
                     .then(response => {
                         const data = response.data;
-                        if(data && data == 'delete success') {
-                            this.showWarning(data);
-                        //    刷新
+                        if(data) {
+                            if(data.data && data.data == 'delete success') {
+                                console.log('delete success')
+                                this.showWarning(data.data);
+                                //    刷新
+                                this.sendRequest();
+                            }
                         }
                     })
                     .catch(error => {
                         this.showWarning(error);
                     });
+            },
+            createSuccessHandler() {
+                this.$('#create-demand-modal').modal('hide');
+                this.initiateData(this.$route.query);
+                this.sendRequest();
             },
             showWarning(msg) {
                 window.alert(msg);

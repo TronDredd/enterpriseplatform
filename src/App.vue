@@ -84,4 +84,7 @@
     border: 1px solid #7c818d;
     border-radius: .2rem;
   }
+  .modal-backdrop {
+    z-index: 0!important;
+  }
 </style>

@@ -7,10 +7,6 @@ input {
     border-radius: 0.8rem;
     padding: 0.6rem 1rem;
 }
-.input-box .search-btn {
-    margin-left: 1.1rem;
-    padding: 0.6rem 1rem;
-}
 select {
     outline: none;
 }

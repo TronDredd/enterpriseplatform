@@ -10,7 +10,7 @@
                 <div class="d-flex flex-row justify-content-between">
                     <div class="info d-flex flex-column">
                         <span>创建者:</span>
-                        <div>{{ item.user_name }}</div>
+                        <div>{{ item.company_name }}</div>
                     </div>
                     <div class="info d-flex flex-column">
                         <span>更新时间:</span>
@@ -25,6 +25,16 @@
                     <div class="info d-flex flex-column">
                         <span>描述:</span>
                         <div>{{ item.description }}</div>
+                    </div>
+                </div>
+                <div class="d-flex flex-row justify-content-between">
+                    <div class="info d-flex flex-column">
+                        <span>联系方式:</span>
+                        <div>{{ item.telephone }}</div>
+                    </div>
+                    <div class="info d-flex flex-column">
+                        <span>具体地址:</span>
+                        <div>{{ item.address }}</div>
                     </div>
                 </div>
                 <div>

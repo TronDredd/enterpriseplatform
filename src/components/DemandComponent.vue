@@ -4,12 +4,12 @@
             <div class="col-8 d-flex flex-column margin-right-2 text-info-box">
                 <span class="title_span">{{ title }}</span>
                 <span class="description_span">{{ description }}</span>
-                <span class="user_name_span">发布者：{{ user_name }}</span>
+                <span class="user_name_span">发布者：{{ user_company }}</span>
             </div>
             <img :src="img_url" class="col-4 flex-shrink-0 demand_img">
         </div>
         <div class="col-3 d-flex flex-row justify-content-end align-items-center">
-            <button class="button-basic button-green">用户详情</button>
+            <button class="button-basic button-green" @click="userDetail">用户详情</button>
             <button class="button-basic margin-left-8" @click="demandDetail">需求详情</button>
         </div>
     </div>
@@ -21,10 +21,13 @@
         props: [
             'title',
             'description',
-            'user_name',
+            'user_company',
             'img_url'
         ],
         methods: {
+            userDetail() {
+                this.$emit('userDetail');
+            },
             demandDetail() {
                 this.$emit('demandDetail');
             }

@@ -14,6 +14,9 @@ import ProductListComponent from "../views/main/function/product/ProductListComp
 import MyProductComponent from "../views/main/function/product/MyProductComponent";
 import DemandDetailComponent from "../views/main/function/demand/DemandDetailComponent";
 import DemandDetailSelfComponent from "../views/main/function/demand/DemandDetailSelfComponent";
+import EmptyComponent from "../components/EmptyComponent";
+import ProductDetailComponent from "../views/main/function/product/ProductDetailComponent";
+import UserInfoComponent from "../views/main/function/userinfo/UserInfoComponent";
 
 Vue.use(VueRouter)
 
@@ -46,6 +49,10 @@ const routes = [
     meta:{ requireAuth: true },
     children: [
       {
+        path: 'user_info',
+        component: UserInfoComponent
+      },
+      {
         path: 'demand_list',
         component: DemandListComponent
       },
@@ -56,6 +63,10 @@ const routes = [
       {
         path: 'my_demand',
         component: MyDemandComponent
+      },
+      {
+        path: 'empty_component',
+        component: EmptyComponent
       },
       {
         path: 'my_demand_detail',
@@ -80,6 +91,10 @@ const routes = [
       {
         path: 'product_list',
         component: ProductListComponent
+      },
+      {
+        path: 'product_detail',
+        component: ProductDetailComponent
       },
       {
         path: 'my_product',

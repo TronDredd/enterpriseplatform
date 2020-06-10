@@ -1,30 +1,38 @@
 <template>
-    <div class="login-wrap" id="account">
-        <div class="login-form" id="form">
-            <div class="form-cover"></div>
-            <div class="form-loader">
-                <div class="spinner">
-                    <svg class="spinner-circular" viewBox="25 25 50 50">
-                        <circle
-                                class="spinner-path"
-                                cx="50"
-                                cy="50"
-                                r="20"
-                                fill="none"
-                                stroke-width="4"
-                                stroke-miterlimit="10"
-                        ></circle>
-                    </svg>
-                </div>
-            </div>
-            <router-view v-on:routerChange="routerChangeHandler(arguments)"></router-view>
+    <div id="account">
+        <div class="logo-box">
+            <img src="../../assets/company_logo.png">
+            <span>企业购销</span>
         </div>
+        <div class="right-box linear-box third-floor">
+            <div class="linear-box linear-box second-floor">
+                <div class="linear-box linear-box first-floor"></div>
+            </div>
+        </div>
+        <div class="left-box linear-box third-floor">
+            <div class="linear-box linear-box second-floor">
+                <div class="linear-box linear-box first-floor"></div>
+            </div>
+        </div>
+        <router-view class="middle"></router-view>
+<!--        <LoginComponent class="middle"></LoginComponent>-->
+<!--        <RegisterComponent class="middle"></RegisterComponent>-->
+        <LoadingComponent v-if="show_loading" style="background-color: rgba(0, 0, 0, 0.2)"></LoadingComponent>
     </div>
 </template>
 
 <script>
+    import LoginComponent from "./LoginComponent";
+    import RegisterComponent from "./RegisterComponent";
+    import LoadingComponent from "../../components/LoadingComponent";
     export default {
         name: "AccountComponent",
+        components: {RegisterComponent, LoginComponent, LoadingComponent},
+        data() {
+            return {
+                show_loading: false,
+            }
+        },
         methods: {
             routerChangeHandler(args) {
                 const component_name = args[0];
@@ -40,156 +48,93 @@
             }
         },
         mounted() {
+            this.show_loading = true;
             setTimeout(() => {
-                document.body.classList.add("on-start")
-            }, 100);
+                this.show_loading = false;
+            }, 1000);
             setTimeout(() => {
                 document.body.classList.add("document-loaded")
-            }, 1800)
+            }, 1200);
+        },
+        beforeRouteEnter(to, from, next) {
+            // if(getCookie('token')) {
+            //     console.log(`the user has been remembered, turn to the main page`);
+            //     sessionStorage.setItem('token', getCookie('token'));
+            //     // next('/main');
+            //     next({path: '/main/user_list', query: {page_num: 1, page_size: 200}});
+            //     return;
+            // }
+            document.body.style.backgroundColor = '#060524';
+            next();
         }
     }
 </script>
 
 <style scoped>
-    .login-wrap {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        background: #3f2766;
-        top: 0;
-        left: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .login-form {
-        display: flex;
+    #account {
         position: relative;
-        align-items: center;
-        justify-content: center;
-        width: 400px;
-        height: 400px;
-        flex-shrink: 0;
-        padding: 20px;
-        border-radius: 5px;
-    }
-    .spinner {
-        position: relative;
-        margin: auto;
-        width: 50px;
-        height: 50px;
-        transition: all 0.2s ease 0s;
-    }
-    .spinner-circular {
-        /*改变元素基点*/
-        transform-origin: center center;
-        position: absolute;
         width: 100%;
+        /*min-width: */
         height: 100%;
-        top: 0;
-        left: 0;
-        margin: auto;
-    }
-    .spinner-path {
-        stroke-dasharray: 1,200;
-        stroke-dashoffset: 0;
-        /*1，动画的名称 2，动画持续的时间 3，动画的过渡类型 贝塞尔曲线 4，设置动画的延迟时间(放在最后) 5，设置动画的循环次数 6，设置动画是否反向运动 7，设置动画时间之外的状态 forwards*/
-        animation: dash 1.3s ease forwards 0.5s;
-        opacity: 0;
-        stroke-linecap: round;
-        stroke: blueviolet;
-        animation-play-state: running;
-    }
-    @keyframes dash {
-        0% {
-            stroke-dasharray: 1,200;
-            opacity: 0;
-        }
-        50% {
-            stroke-dasharray: 40,200;
-            opacity: 1;
-        }
-        100% {
-            /*3.14 * 20 * 2*/
-            stroke-dasharray: 125,200;
-            opacity: 1;
-        }
-    }
-    .form-loader {
-        display: flex;
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 100%;
-        justify-content: center;
-        align-items: center;
-        z-index: -4;
-        transition: all 0.5s ease;
-    }
-    .form-cover {
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 100%;
-        z-index: -4;
-        border-radius: 7px;
+        min-width: 1280px;
+        min-height: 678px;
         overflow: hidden;
-        transition: all 0.3s ease 0.8s;
-        box-shadow: 0 0 0 0 rgba(0,0,0,0);
     }
-    .form-cover:after {
-        content: "";
+    .logo-box {
         position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 100%;
-        background: #4d317a;
-        z-index: -4;
-        border-radius: 50%;
-        transition: all 1.5s ease 0.3s;
-        transform: scale(0);
+        top: 2.3rem;
+        left: 6rem;
     }
-    .form-cover:before {
-        content: "";
+    .logo-box img {
+        width: 4.4rem;
+        height: 4.4rem;
+    }
+    .logo-box span {
+        font-size: 1.9rem;
+        font-weight: bold;
+        color: #ffffff;
+        letter-spacing: .6rem;
+        margin-left: 1.2rem;
+    }
+    .middle {
         position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 100%;
-        background: #ffffff;
-        z-index: -5;
-        border-radius: 50%;
-        transition: all 0.5s ease;
-        transform: scale(0);
-    }
-    body.on-start .form-cover:before {
-        transform: scale(0.15);
-    }
-    body.document-loaded .form-loader {
-        transform: scale(0);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -40%);
         opacity: 0;
-        visibility: hidden;
+        transition: all .6s linear .4s;
     }
-    body.document-loaded .form-cover {
-        box-shadow: 0 20px 50px rgba(255, 255, 255 ,0.2);
-    }
-    body.document-loaded .form-cover:after {
-        transform: scale(2);
-    }
-    body.document-loaded .form-cover:before {
-        -webkit-transition: opacity 0.3s ease 0.8s, -webkit-transform 2s ease;
-        transition: opacity 0.3s ease 0.8s, -webkit-transform 2s ease;
-        transition: transform 2s ease, opacity 0.3s ease 0.8s;
-        transition: transform 2s ease, opacity 0.3s ease 0.8s,
-        -webkit-transform 2s ease;
-        transform: scale(2);
+    .document-loaded .middle {
+        transform: translate(-50%, -50%);
         opacity: 1;
     }
-    body.document-loaded .form-content {
-        opacity: 1;
-        transform: none;
+    .right-box {
+        position: absolute;
+        top: 14.5rem;
+        right: 16.8rem;
+        opacity: 0.5;
+    }
+    .first-floor {
+        width: 49.7rem;
+        height: 34.1rem;
+    }
+    .second-floor {
+        padding: 5.9rem 3.7rem;
+    }
+    .third-floor {
+        padding: 5.9rem 3.7rem;
+        transform: rotate(25deg);
+    }
+    .linear-box {
+        border: 8px solid;
+        border-image: linear-gradient(200deg, rgba(56,49,193,1), rgba(26,22,141,0) 16%) 8 8;
+    }
+    /* 顺序问题 */
+    .left-box {
+        position: absolute;
+        bottom: 14.5rem;
+        left: 16.5rem;
+        opacity: 0.5;
+        transform: rotate(205deg);
     }
 </style>
