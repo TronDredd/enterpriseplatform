@@ -61,7 +61,7 @@
                 }
                 const params = new URLSearchParams();
                 params.append('user_name', user_name);
-                params.append('password', password);
+                params.append('password', this.$md5(password));
                 params.append('telephone', telephone);
                 params.append('industry', '0');
 
@@ -70,7 +70,9 @@
                     .then(response => {
                         console.log(JSON.stringify(response.data));
                         const data = response.data.data;
-                        if(data && data == 'register success') {
+                        if(data) {
+                            console.log(data);
+                            sessionStorage.setItem('token', data);
                             //user_name保存在sessionStorage中
                             sessionStorage.setItem('user_name', user_name);
                             const user_info = {
@@ -79,7 +81,12 @@
                             };
                             this.$store.commit('updateUserInfo', user_info);
                             //注册成功 直接跳到主页
-                            this.$router.push({name: 'Main'});
+                            const query = {page_num: 1, page_size: 20, filter: 0, province: 0};
+                            //登录成功 跳转至主界面
+                            this.$router.push({
+                                path: '/main/demand_list',
+                                query: query
+                            });
                         }
                     })
                     .catch(error => {

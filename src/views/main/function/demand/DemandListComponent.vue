@@ -102,7 +102,7 @@
                             this.last_page = Math.ceil(total/this.page_size);
                         } else {
                             this.$alert('查询结果为空');
-                            this.$router.back();
+                            this.search_content = '';
                         }
                     })
             },

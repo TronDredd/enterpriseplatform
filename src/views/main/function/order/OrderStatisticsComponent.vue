@@ -217,7 +217,7 @@
                         break;
                     case 'year':
                         // month 1开始
-                        month = this.getMonthNumber(this.query_time);
+                        month = this.getMonthNumber(this.query_time) + 1;
                         console.log(`month: ${month}`);
                         buy_chart_data = new Array(month).fill(0);
                         sell_chart_data = new Array(month).fill(0);
@@ -226,11 +226,11 @@
                         }
                         for(let i = 0;i < this.buy_list.length;i++) {
                             i_month = this.getMonthNumber(this.buy_list[i].update_time);
-                            buy_chart_data[i_month - 1]++;
+                            buy_chart_data[i_month]++;
                         }
                         for(let i = 0;i < this.sell_list.length;i++) {
                             i_month = this.getMonthNumber(this.sell_list[i].update_time);
-                            sell_chart_data[i_month - 1]++;
+                            sell_chart_data[i_month]++;
                         }
                         break;
                     case 'last month':
@@ -300,10 +300,6 @@
                             sell_chart_data[i_day - 1] = this.sell_list[i].money;
 
                         }
-                        // sell_chart_data.forEach((value, index) => {
-                        //     income_chart_data[index] = value - buy_chart_data[index];
-                        //     // expense_chart_data[index] = -1 * income_chart_data[index];
-                        // });
                         console.log(sell_chart_data, buy_chart_data);
                         console.log(`expense_chart_data: ${expense_chart_data}`);
                         break;
@@ -327,7 +323,7 @@
                         console.log(sell_chart_data);
                         break;
                     case 'year':
-                        month = this.getMonthNumber(this.query_time);
+                        month = this.getMonthNumber(this.query_time) + 1;
                         console.log(`month: ${month}`);
                         buy_chart_data = new Array(month).fill(0);
                         sell_chart_data = new Array(month).fill(0);
@@ -338,11 +334,11 @@
                         }
                         for(let i = 0;i < this.buy_list.length;i++) {
                             i_month = this.getMonthNumber(this.buy_list[i].update_time);
-                            buy_chart_data[i_month - 1] = this.buy_list[i].money;
+                            buy_chart_data[i_month] = this.buy_list[i].money;
                         }
                         for(let i = 0;i < this.sell_list.length;i++) {
                             i_month = this.getMonthNumber(this.sell_list[i].update_time);
-                            sell_chart_data[i_month - 1] = this.sell_list[i].money;
+                            sell_chart_data[i_month] = this.sell_list[i].money;
                         }
                         break;
                     case 'last year':

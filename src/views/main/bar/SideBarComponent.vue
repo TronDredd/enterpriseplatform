@@ -102,7 +102,7 @@
                         <router-link :to="{path: '/main/product_list', query:{page_num: 1, page_size: 20, filter: 0}}">产品列表</router-link>
                     </li>
                     <li>
-                        <router-link :to="{path: '/main/my_product', query: {page_num: 1, page_size: 20, user_id: getUserId}}">我的供应</router-link>
+                        <router-link :to="{path: '/main/my_product', query: {page_num: 1, page_size: 20, user_id: getUserId}}">我的产品</router-link>
                     </li>
                 </ul>
                 <ul class="hover-sublist supply-hover-sublist">
@@ -113,7 +113,7 @@
                         <router-link :to="{path: '/main/product_list', query:{page_num: 1, page_size: 20, filter: 0}}">产品列表</router-link>
                     </li>
                     <li>
-                        <router-link :to="{path: '/main/my_product', query: {page_num: 1, page_size: 20, user_id: getUserId}}">我的供应</router-link>
+                        <router-link :to="{path: '/main/my_product', query: {page_num: 1, page_size: 20, user_id: getUserId}}">我的产品</router-link>
                     </li>
                 </ul>
             </li>
