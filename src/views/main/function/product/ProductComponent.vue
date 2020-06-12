@@ -3,7 +3,7 @@
         <img :src="item.image_list.length > 0 ? $urlImageBase + item.image_list[0].img : '../assets.logo.png'" width="200" height="160">
         <div class="product-description">
             <span class="product-price">
-                ￥{{ item.product_price }}
+                ￥{{ item.product_price }} /{{ item.unit }}
             </span>
             <span class="product-name">
                 {{ item.product_name }}

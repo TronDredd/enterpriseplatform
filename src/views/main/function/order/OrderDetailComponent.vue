@@ -103,12 +103,12 @@
                     .then(response => {
                         const result = response.data.result;
                         if(result && result == 'modify success') {
-                            window.alert(result);
+                            this.$alert('订单修改成功', 1);
                             this.modelChange();
                         }
                     })
                     .catch(error => {
-                        window.alert(error);
+                        console.log(error);
                         this.modelChange();
                     })
             }

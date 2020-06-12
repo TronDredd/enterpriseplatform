@@ -116,20 +116,8 @@
                             this.number = list.length;
                             this.last_page = Math.ceil(total/this.page_size);
                         } else {
-                            this.showWarning(msgs[2]);
+                            this.$alert('查询结果为空');
                             this.$router.back();
-                        }
-                    })
-                    .catch(error => {
-                        const error_code = error.response.data.error_code;
-                        if(error_code) {
-                            switch (error_code) {
-                                case '400101':
-                                    this.showWarning(msgs[0]);
-                                    break;
-                                default:
-                                    this.showWarning(msgs[1]);
-                            }
                         }
                     })
             },
@@ -205,7 +193,7 @@
                     .then(response => {
                         const data = response.data.data;
                         if(data && data == 'delete success') {
-                            this.showWarning(msgs[3]);
+                            this.$alert('订单删除成功');
                             //刷新 重新请求
                             this.routeFetchList(this.$route.query);
                         }
@@ -213,9 +201,6 @@
                     .catch(error => {
                         alert(error);
                     })
-            },
-            showWarning(msg) {
-                alert(msg);
             }
         },
         computed: {

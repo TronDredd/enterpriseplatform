@@ -47,12 +47,6 @@
     import CheckModal from "../../../../components/CheckModal";
     import qs from 'qs';
 
-    const msgs = [
-        '缺少参数',
-        '其他异常',
-        '缺少返回值'
-    ];
-
     export default {
         name: "MyDemandComponent",
         components: {CheckModal, CreateDemandComponent, DemandSelfComponent, ListHeader, PagingComponent},
@@ -87,21 +81,9 @@
                             this.number = list.length;
                             this.last_page = Math.ceil(total/this.page_size);
                         } else {
-                            this.showWarning(msgs[2]);
+                            this.$alert('查询结果为空', 2);
                         }
                     })
-                .catch(error => {
-                    const error_code = error.response.data.error_code;
-                    if(error_code) {
-                        switch (error_code) {
-                            case '400101':
-                                this.showWarning(msgs[0]);
-                                break;
-                            default:
-                                this.showWarning(msgs[1]);
-                        }
-                    }
-                })
             },
             sendRequest() {
                 const page_num = this.$route.query.page_num,
@@ -172,24 +154,18 @@
                         const data = response.data;
                         if(data) {
                             if(data.data && data.data == 'delete success') {
-                                console.log('delete success')
-                                this.showWarning(data.data);
+                                console.log('delete success');
+                                this.$alert('删除成功', 1);
                                 //    刷新
                                 this.sendRequest();
                             }
                         }
                     })
-                    .catch(error => {
-                        this.showWarning(error);
-                    });
             },
             createSuccessHandler() {
                 this.$('#create-demand-modal').modal('hide');
                 this.initiateData(this.$route.query);
                 this.sendRequest();
-            },
-            showWarning(msg) {
-                window.alert(msg);
             }
         },
         computed: {

@@ -36,10 +36,13 @@ axios.interceptors.response.use(
             if (err.response.data) {
                 const error_code = err.response.data.error_code;
                 switch (error_code) {
-                    case '400101':
+                    case 403101:
+                        err.message = '账号或密码错误';
+                        break;
+                    case 400101:
                         err.message = '请求参数缺少';
                         break;
-                    case '400102':
+                    case 400102:
                         sessionStorage.removeItem('token');
                         router.replace('/').catch(() => {
                         });

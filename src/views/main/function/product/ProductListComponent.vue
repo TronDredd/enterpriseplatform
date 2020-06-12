@@ -87,20 +87,8 @@
                             this.number = list.length;
                             this.last_page = Math.ceil(total/this.page_size);
                         } else {
-                            this.showWarning(msgs[2]);
+                            this.$alert('输入不能为空');
                             this.$router.back();
-                        }
-                    })
-                    .catch(error => {
-                        const error_code = error.response.data.error_code;
-                        if(error_code) {
-                            switch (error_code) {
-                                case '400101':
-                                    this.showWarning(msgs[0]);
-                                    break;
-                                default:
-                                    this.showWarning(msgs[1]);
-                            }
                         }
                     })
             },

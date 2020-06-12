@@ -3,10 +3,10 @@
         <div id="user-info" class="d-flex flex-column position-relative">
             <CloseComponent></CloseComponent>
             <ListHeader :list-name="listHeaderName" :block_color="listBlockColor"></ListHeader>
-            <div class="content-box flex-grow-1 d-flex flex-column">
+            <div v-if="show_info" class="content-box flex-grow-1 d-flex flex-column">
                 <div class="info-title d-flex flex-row justify-content-between">
                     <div></div>
-                    <div>
+                    <div v-if="is_editable">
                         <button v-if="show_edit" class="button-basic" @click="modelChange">编辑</button>
                         <button v-if="!show_edit" class="button-basic button-grey margin-left-8" @click="modelChange">取消</button>
                         <button v-if="!show_edit" class="button-basic margin-left-8" @click="submitModification()">保存</button>
@@ -66,9 +66,11 @@
         components: {ListHeader, CloseComponent},
         data() {
             return {
+                show_info: false,
                 show_edit: true,
-                item: JSON.parse(this.$route.query.item),
-                old_item: Object.assign({}, this.$route.query.item)
+                item: null,
+                old_item: Object.assign({}, this.$route.query.item),
+                is_editable: false
             }
         },
         methods: {
@@ -86,12 +88,12 @@
                     .then(response => {
                         const result = response.data.result;
                         if(result && result == 'modify success') {
-                            window.alert(result);
+                            this.$alert('用户信息修改成功');
                             this.modelChange();
                         }
                     })
                     .catch(error => {
-                        window.alert(error);
+                        console.log(error);
                         this.modelChange();
                     })
             }
@@ -103,6 +105,13 @@
             listBlockColor() {
                 return 'block-purple'
             }
+        },
+        mounted() {
+            const selected_user_id = JSON.parse(this.$route.query.item).user_id;
+            const user_id = this.$store.state.user_info.user_id;
+            this.is_editable = selected_user_id == user_id ;
+            this.item = JSON.parse(this.$route.query.item);
+            this.show_info = true;
         }
     }
 </script>

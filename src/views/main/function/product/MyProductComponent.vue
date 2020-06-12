@@ -33,7 +33,7 @@
                         <td class="col-2">{{ '￥'+item.product_price }}</td>
                         <td class="col-2">{{ item.unit }}</td>
                         <td class="col-2">
-                            <button @click="productDeleteHandler(item.product_id)" class="button-basic button-grey margin-left-8">删除订单</button>
+                            <button @click="productDeleteHandler(item.product_id)" class="button-basic button-grey margin-left-8">删除产品</button>
                         </td>
                     </tr>
                     </tbody>
@@ -62,12 +62,6 @@
     import CheckModal from "../../../../components/CheckModal";
     import qs from 'qs';
     import CreateProductComponent from "./CreateProductModal";
-    const msgs = [
-        '缺少参数',
-        '其他异常',
-        '查询结果为空',
-        '订单删除成功'
-    ];
 
     export default {
         name: "MyProductComponent",
@@ -100,7 +94,7 @@
                             this.number = list.length;
                             this.last_page = Math.ceil(total/this.page_size);
                         } else {
-                            this.showWarning(msgs[2]);
+                            this.$alert('输入不能为空');
                             // this.$router.back();
                         }
                     })
@@ -156,13 +150,13 @@
                     .then(response => {
                         const data = response.data.data;
                         if(data && data == 'delete success') {
-                            this.showWarning(msgs[3]);
+                            this.$alert('产品删除成功');
                             //刷新 重新请求
                             this.routeFetchList(this.$route.query);
                         }
                     })
                     .catch(error => {
-                        alert(error);
+                        console.log(error);
                     })
             },
             createProductHandler() {
@@ -171,9 +165,6 @@
             createSuccessHandler() {
                 this.$('#create-product-modal').modal('hide');
                 this.routeFetchList(this.$route.query);
-            },
-            showWarning(msg) {
-                alert(msg);
             }
         },
         computed: {

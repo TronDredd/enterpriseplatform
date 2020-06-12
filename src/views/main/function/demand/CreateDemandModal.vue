@@ -100,7 +100,7 @@
                     .post(urlDemandImg2, params)
                     .then(response => {
                         console.log(response.data);
-                        this.showWarning(msgs[0]);
+                        this.$alert('需求创建成功', 1);
                         this.$emit('createSuccessEvent');
                     })
                     .catch(error => {
@@ -132,9 +132,6 @@
                 const user_id = this.$store.state.user_info.user_id;
                 console.log(`user_id from vuex: ${user_id}`);
                 return user_id;
-            },
-            showWarning(msg) {
-                window.alert(msg);
             }
         },
         mounted() {

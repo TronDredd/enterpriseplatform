@@ -14,6 +14,7 @@ import {urlImageBase} from "./utils/urls";
 import formatTime from "./utils/timeFormat";
 import {registryAlertComponent} from "./components/AlertComponent";
 import buyInOrSellMap from "./utils/buyInOrSellMap";
+import md5 from 'js-md5';
 
 Vue.use(ant);
 Vue.use(registryAlertComponent);
@@ -30,6 +31,8 @@ Vue.prototype.$categoryMap = categoryMap;
 Vue.prototype.$buyInOrSellMap = buyInOrSellMap;
 Vue.prototype.$urlImageBase = urlImageBase;
 Vue.prototype.$formatTime = formatTime;
+Vue.prototype.$md5 = md5;
+
 Vue.use(Echarts);
 Vue.use(registryAlertComponent);
 

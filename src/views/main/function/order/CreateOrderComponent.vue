@@ -104,7 +104,7 @@
                         const data = response.data.data;
                         if(data && data == 'create success') {
                             //订单创建成功
-                            this.showWarning(msgs[1]);
+                            this.$alert('订单创建成功', 1);
                             //清空输入框的数据
                             this.initiateData();
                         }
@@ -115,7 +115,7 @@
             },
             initiateParams() {
                 if(this.title == null || this.money == null) {
-                    this.showWarning(msgs[0]);
+                    this.$alert('输入不能为空');
                     return null;
                 }
                 const params = new URLSearchParams();
@@ -147,9 +147,6 @@
                 const user_id = this.$store.state.user_info.user_id;
                 console.log(`user_id from vuex: ${user_id}`);
                 return user_id;
-            },
-            showWarning(msg) {
-                alert(msg);
             }
         },
         computed: {

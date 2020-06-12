@@ -89,7 +89,11 @@
                             console.log(`order statistics: ${JSON.stringify(buy_data)}, ${JSON.stringify(sell_data)}`);
                             this.buy_list = buy_data;
                             this.sell_list = sell_data;
-                            this.initiateChartData();
+                            if(this.chart_category == 'order_number') {
+                                this.initiateChartData();
+                            } else {
+                                this.initiateChartMoneyData();
+                            }
                             this.show_chart = true;
                             this.initiateChart();
                         }
@@ -273,7 +277,7 @@
             initiateChartMoneyData() {
                 console.log('initiate chart money data');
                 let x_data = [], y_data = [], count_max = 0,
-                    sell_chart_data = [], buy_chart_data = [], income_chart_data = [],
+                    sell_chart_data = [], buy_chart_data = [], income_chart_data = [], expense_chart_data = [],
                     month, day, i_day = 0, i_month = 0;
                 switch (this.time_category) {
                     case 'month':
@@ -283,6 +287,7 @@
                         buy_chart_data = new Array(day).fill(0);
                         sell_chart_data = new Array(day).fill(0);
                         income_chart_data = new Array(day).fill(0);
+                        expense_chart_data = new Array(day).fill(0);
                         for(let i = 0; i < day;i++) {
                             x_data[i] = `${i + 1}日`;
                         }
@@ -292,18 +297,23 @@
                         }
                         for(let i = 0;i < this.sell_list.length;i++) {
                             i_day = this.getDateNumber(this.sell_list[i].update_time);
-                            console.log(`i_day: ${i_day}`)
                             sell_chart_data[i_day - 1] = this.sell_list[i].money;
-                            income_chart_data[i_day - 1] = this.sell_list[i].money - this.buy_list[i].money;
+
                         }
+                        // sell_chart_data.forEach((value, index) => {
+                        //     income_chart_data[index] = value - buy_chart_data[index];
+                        //     // expense_chart_data[index] = -1 * income_chart_data[index];
+                        // });
                         console.log(sell_chart_data, buy_chart_data);
+                        console.log(`expense_chart_data: ${expense_chart_data}`);
                         break;
                     case 'last month':
                         //创建指定长度的数组 day 1开始
                         buy_chart_data = new Array(31).fill(0);
                         sell_chart_data = new Array(31).fill(0);
                         income_chart_data = new Array(31).fill(0);
-                        for(let i = 0; i < day;i++) {
+                        expense_chart_data = new Array(31).fill(0);
+                        for(let i = 0; i < 31;i++) {
                             x_data[i] = `${i + 1}日`;
                         }
                         for(let i = 0;i < this.buy_list.length;i++) {
@@ -313,7 +323,6 @@
                         for(let i = 0;i < this.sell_list.length;i++) {
                             i_day = this.getDateNumber(this.sell_list[i].update_time);
                             sell_chart_data[i_day - 1] = this.sell_list[i].money;
-                            income_chart_data[i_day - 1] = this.sell_list[i].money - this.buy_list[i].money;
                         }
                         console.log(sell_chart_data);
                         break;
@@ -323,6 +332,7 @@
                         buy_chart_data = new Array(month).fill(0);
                         sell_chart_data = new Array(month).fill(0);
                         income_chart_data = new Array(month).fill(0);
+                        expense_chart_data = new Array(month).fill(0);
                         for(let i = 0; i < month;i++) {
                             x_data[i] = `${i + 1}月`;
                         }
@@ -333,13 +343,13 @@
                         for(let i = 0;i < this.sell_list.length;i++) {
                             i_month = this.getMonthNumber(this.sell_list[i].update_time);
                             sell_chart_data[i_month - 1] = this.sell_list[i].money;
-                            income_chart_data[i_month - 1] = this.sell_list[i].money - this.buy_list[i].money;
                         }
                         break;
                     case 'last year':
                         buy_chart_data = new Array(12).fill(0);
                         sell_chart_data = new Array(12).fill(0);
                         income_chart_data = new Array(12).fill(0);
+                        expense_chart_data = new Array(12).fill(0);
                         for(let i = 0; i < 12;i++) {
                             x_data[i] = `${i + 1}月`;
                         }
@@ -350,11 +360,15 @@
                         for(let i = 0;i < this.sell_list.length;i++) {
                             i_month = this.getMonthNumber(this.sell_list[i].update_time);
                             sell_chart_data[i_month - 1] = this.sell_list[i].money;
-                            income_chart_data[i_month - 1] = this.sell_list[i].money - this.buy_list[i].money;
                         }
                         break;
                 }
+                sell_chart_data.forEach((value, index) => {
+                    income_chart_data[index] = value - buy_chart_data[index];
+                    // expense_chart_data[index] = -1 * income_chart_data[index];
+                });
                 count_max = Math.max(...buy_chart_data, ...sell_chart_data);
+                console.log(count_max);
                 for(let i = 0;i <= count_max;i++) {
                     y_data[i] = i;
                 }
@@ -363,7 +377,7 @@
                 this.sell_chart_data = sell_chart_data;
                 this.buy_chart_data = buy_chart_data;
                 this.income_chart_data = income_chart_data;
-                this.expense_chart_data = income_chart_data.map(item => item * -1);
+                this.expense_chart_data = income_chart_data.map(item => -1 * item);
             },
             getDateNumber(time) {
                 return Number(new Date(time).getDate());

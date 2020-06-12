@@ -17,7 +17,7 @@
         position: fixed;
         height: 3.6rem;
         line-height: 3.6rem;
-        top: 12%;
+        top: 10%;
         left: 50%;
         z-index: 31;
         transform: translateX(-50%);
@@ -32,25 +32,29 @@
                     -2px -1px 10px #DBDBDB;
     }
     .fade-in {
-        animation: animation_in 0.25s;
+        animation: animation_in 0.36s;
     }
     .fade-out {
-        animation: animation_out 0.25s;
+        animation: animation_out 0.36s;
     }
     @keyframes animation_in {
         0% {
             opacity: 0;
+            top: 8%;
         }
         100% {
             opacity: 1;
+            top: 10%;
         }
     }
     @keyframes animation_out {
         0% {
             opacity: 1;
+            top: 10%;
         }
         100% {
             opacity: 0;
+            top: 8%;
         }
     }
 </style>

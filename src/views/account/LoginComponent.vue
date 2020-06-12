@@ -58,7 +58,8 @@
                 //POST请求体form-Data中的参数
                 const params = new URLSearchParams();
                 params.append('user_name', user_name);
-                params.append('password', password);
+                // 使用md5加密
+                params.append('password', this.$md5(password));
                 this.$axios
                     .post(urlLogin, params)
                     .then(response => {
@@ -72,6 +73,7 @@
                                 sessionStorage.setItem('token', data.token);
                                 if(this.is_remember) {
                                     localStorage.setItem('token', data.token);
+                                    localStorage.setItem('user_info', JSON.stringify(data));
                                 }
                             }
                             const query = {page_num: 1, page_size: 20, filter: data.industry, province: 0};
@@ -109,8 +111,15 @@
         },
         mounted() {
             if(localStorage.getItem('token')) {
+                const query = {
+                    page_num: 1,
+                    page_size: 20,
+                    filter: JSON.parse(localStorage.getItem('user_info')).industry,
+                    province: 0
+                };
+                this.$store.commit('updateUserInfo', JSON.parse(localStorage.getItem('user_info')));
                 sessionStorage.setItem('token', localStorage.getItem('token'));
-                this.$router.push({name: 'Main'})
+                this.$router.push({path: '/main/demand_list', query: query})
             }
         }
     }

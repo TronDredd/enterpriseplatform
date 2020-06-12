@@ -65,9 +65,7 @@
     // 图片上传机制需要改进
     import UploadPictureComponent from "../../../../components/UploadPictureComponent";
     import {urlCreateProduct, urlProductImg2} from "../../../../utils/urls";
-    const msgs = [
-        '需求创建成功'
-    ]
+
     export default {
         name: "CreateProductComponent",
         components: {UploadPictureComponent},
@@ -107,7 +105,7 @@
                     .post(urlProductImg2, params)
                     .then(response => {
                         console.log(response.data);
-                        this.showWarning(msgs[0]);
+                        this.$alert('产品上传成功', 1);
                         this.$emit('createSuccessEvent');
                     })
                     .catch(error => {
@@ -139,9 +137,6 @@
                 const user_id = this.$store.state.user_info.user_id;
                 console.log(`user_id from vuex: ${user_id}`);
                 return user_id;
-            },
-            showWarning(msg) {
-                window.alert(msg);
             }
         },
         mounted() {
